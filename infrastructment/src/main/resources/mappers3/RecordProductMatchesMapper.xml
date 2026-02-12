@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordProductMatchesMapper">
+    <insert id="insertBatch">
+        insert into record_product_matches(
+                                           version,
+                    chain_id,
+                    enterprise_id, enterprise_name, enterprise_uni_code,
+                    product_id, product_name, product_url, product_description, product_purpose,
+                    label_id, label_name,
+                    node_id,node_name,
+                    matched_score, match_reason,check_reason)
+        values
+        <foreach collection='list' item='item' separator=','>
+            (
+            #{version},
+            #{item.industryChainId},
+            #{item.enterpriseId},
+            #{item.enterpriseName},
+            #{item.enterpriseUniCode},
+            #{item.productId},
+            #{item.productName},
+            #{item.productUrl},
+            #{item.productDescription},
+            #{item.productPurpose},
+            #{item.industryLabelId},
+            #{item.industryLabelName},
+            #{item.industryChainNodeId},
+            #{item.industryChainNodeName},
+            #{item.matchedProductScore},
+            #{item.extraReason},
+            #{item.checkReason}
+            )
+        </foreach>
+        on duplicate key update
+            version = values(version),
+            enterprise_id = values(enterprise_id),
+            enterprise_name = values(enterprise_name),
+            enterprise_uni_code = values(enterprise_uni_code),
+            product_name = values(product_name),
+            product_url = values(product_url),
+            product_description = values(product_description),
+            product_purpose = values(product_purpose),
+            label_id = values(label_id),
+            label_name = values(label_name),
+            node_id = values(node_id),
+            node_name = values(node_name),
+            matched_score = values(matched_score),
+            match_reason = values(match_reason),
+            check_reason = values(check_reason)
+    </insert>
+    <insert id="insertBatchIgnore">
+        insert ignore into record_product_matches(
+            version,
+            chain_id,
+            enterprise_id, enterprise_name, enterprise_uni_code,
+            product_id, product_name, product_url, product_description, product_purpose,
+            label_id, label_name,
+            node_id,node_name,
+            matched_score, match_reason,check_reason)
+        values
+        <foreach collection='list' item='item' separator=','>
+            (
+            #{version},
+            #{item.industryChainId},
+            #{item.enterpriseId},
+            #{item.enterpriseName},
+            #{item.enterpriseUniCode},
+            #{item.productId},
+            #{item.productName},
+            #{item.productUrl},
+            #{item.productDescription},
+            #{item.productPurpose},
+            #{item.industryLabelId},
+            #{item.industryLabelName},
+            #{item.industryChainNodeId},
+            #{item.industryChainNodeName},
+            #{item.matchedProductScore},
+            #{item.extraReason},
+            #{item.checkReason}
+            )
+        </foreach>
+    </insert>
+    <delete id="physicsDeleteByRelation">
+        delete from record_product_matches rpm
+        where rpm.chain_id = #{chain_id}
+          and rpm.label_id = #{label_id}
+          and rpm.node_id = #{node_id}
+    </delete>
+    <select id="getExistRelationByChainId"
+            resultType="cn.idicc.taotie.infrastructment.entity.icm.RecordProductMatchesDO"
+            parameterType="java.lang.Long">
+        select distinct label_id,node_id
+        from record_product_matches rpm
+        where rpm.chain_id = #{chain_id}
+    </select>
+    <select id="pageList"
+            resultType="cn.idicc.taotie.infrastructment.response.icm.RecordProductMatchesAiCheckDTO">
+        select rpm.*
+        from record_product_matches rpm
+        where rpm.chain_id = #{chain_id}
+        <if test="enterprise_name != null and enterprise_name != ''">
+            and rpm.enterprise_name like concat('%',#{enterprise_name},'%')
+        </if>
+        <if test="product_name != null and product_name != ''">
+            and rpm.product_name like concat('%',#{product_name},'%')
+        </if>
+        order by rpm.id
+    </select>
+    <select id="getExistsChainIds" resultType="java.lang.Long">
+        select distinct rpm.chain_id
+        from record_product_matches rpm
+    </select>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.xiaoai.EnterpriseCorrelationLabelMapper">
+
+    <select id="getLabelsByEnterpriseId" resultType="cn.idicc.taotie.infrastructment.entity.data.EnterpriseLabelDO">
+        SELECT b.id,
+        b.label_name,
+        b.is_qualification
+        FROM enterprise_correlation_label a
+        INNER JOIN enterprise_label b ON a.label_id = b.id
+        WHERE a.deleted = 0
+        AND b.deleted = 0
+        AND a.enterprise_id = #{enterpriseId}
+        <if test="labelTypeId != null">
+            AND b.label_type_id = ${labelTypeId}
+        </if>
+    </select>
+</mapper>

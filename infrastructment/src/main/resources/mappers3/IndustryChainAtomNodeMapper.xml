@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.IndustryChainAtomNodeMapper">
+
+    <select id="selectOne" parameterType="map" resultType="cn.idicc.taotie.infrastructment.entity.icm.AtomNodeRefIndustryLabelDO">
+        select * from industry_chain_atom_node
+                 where atom_node_name = #{atomNodeName}
+    </select>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from industry_chain_atom_node where id = #{id}
+    </delete>
+
+
+</mapper>

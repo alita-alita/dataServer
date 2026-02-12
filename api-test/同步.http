@@ -1,0 +1,47 @@
+### 任务列表
+POST {{base_url}}/record/admin/sync/task/page
+Content-Type: application/json
+token: {{token}}
+
+{
+  "pageNum": 1,
+  "pageSize": 10
+}
+
+### 任务实例列表
+POST {{base_url}}/record/admin/sync/instance/page
+Content-Type: application/json
+token: {{token}}
+
+{
+  "taskId": 1,
+  "pageNum": 1,
+  "pageSize": 10
+}
+
+### 任务实例Job列表
+POST {{base_url}}/record/admin/sync/job/page
+Content-Type: application/json
+token: {{token}}
+
+{
+  "instanceId": 16,
+  "pageNum": 1,
+  "pageSize": 10
+}
+
+### 提交同步任务
+POST {{base_url}}/record/admin/sync/submit
+Content-Type: application/json
+token: {{token}}
+
+{
+  "taskId": 12,
+  "remark": "测试",
+  "param": "-chains 112"
+}
+
+### 获取同步任务日志
+GET {{base_url}}/record/admin/sync/job/log?jobId=68b7f8c2-d03d-49c6-a1ad-c09aa028b4ae&offset=3&type=STDOUT
+Content-Type: application/json
+token: {{token}}

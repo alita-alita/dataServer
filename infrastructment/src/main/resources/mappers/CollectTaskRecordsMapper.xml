@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 1.在mybats的开发中namespace有特殊的意思，一定要是对应接口的全限定名通过namespace可以简历mapper.xml和接口之间的关系(名字不重要，位置不重要)-->
+
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.spider.ConllectTaskRecordsMapper">
+
+    <resultMap id="collectTaskRecordsMap" type="cn.idicc.taotie.infrastructment.entity.spider.CollectTaskRecords">
+        <result column="collect_task_records_id" property="collectTaskRecordsId"/>
+        <result column="collect_task_records_name" property="collectTaskRecordsName"/>
+        <result column="collect_task_records_state" property="collectTaskRecordsState"/>
+        <result column="collect_task_records_type" property="collectTaskRecordsType"/>
+    </resultMap>
+
+    <insert id="addConllectTaskRecords">
+        INSERT INTO collect_task_records(collect_task_records_name,collect_task_records_state,collect_task_records_type)
+        VALUES(#{collectTaskRecordsName},  #{collectTaskRecordsState},  #{collectTaskRecordsType})
+    </insert>
+
+    <select id="listConllectTaskRecords" resultMap="collectTaskRecordsMap">
+        SELECT collect_task_records_id,
+               collect_task_records_name,
+               collect_task_records_state,
+               collect_task_records_type
+        FROM collect_task_records
+        <where>
+            <if test="collectTaskRecordsType != null ">
+              AND  collect_task_records_type = #{collectTaskRecordsType}
+              AND deleted = 0
+            </if>
+        </where>
+        ORDER BY collect_task_records_id DESC;
+    </select>
+
+</mapper>

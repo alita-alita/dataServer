@@ -1,0 +1,93 @@
+### 链式企业知识库
+PUT /dev_knowledge_enterprise
+
+{
+  "settings" : {
+    "number_of_shards": "1",
+    "number_of_replicas": "1",
+    "analysis": {
+      "analyzer": {
+        "one_analyzer": {
+          "tokenizer": "one_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "one_tokenizer": {
+          "token_chars": [
+            "letter",
+            "digit"
+          ],
+          "min_gram": "1",
+          "type": "ngram",
+          "max_gram": "1"
+        }
+      }
+    }
+  },
+  "mappings": {
+    "dynamic": "false",
+    "properties": {
+      "academicCode": {
+        "type": "keyword"
+      },
+      "academicMd5s": {
+        "type": "keyword"
+      },
+      "ancestorCode": {
+        "type": "keyword"
+      },
+      "area": {
+        "type": "keyword"
+      },
+      "chainIds": {
+        "type": "long"
+      },
+      "city": {
+        "type": "keyword"
+      },
+      "enterpriseLabelIds": {
+        "type": "long"
+      },
+      "enterpriseName": {
+        "type": "text",
+        "analyzer": "one_analyzer"
+      },
+      "enterpriseProducts": {
+        "type": "text",
+        "analyzer": "one_analyzer"
+      },
+      "expansionIndex": {
+        "type": "double"
+      },
+      "id": {
+        "type": "long"
+      },
+      "partnerUniCodes": {
+        "type": "keyword"
+      },
+      "province": {
+        "type": "keyword"
+      },
+      "registeredCapitalYuan": {
+        "type": "double"
+      },
+      "relationships": {
+        "type": "nested",
+        "properties": {
+          "counterpartRegionCode": {
+            "type": "keyword"
+          },
+          "hisRelationshipDegree": {
+            "type": "keyword"
+          },
+          "hisRelationshipType": {
+            "type": "long"
+          }
+        }
+      },
+      "unifiedSocialCreditCode": {
+        "type": "keyword"
+      }
+    }
+  }
+}

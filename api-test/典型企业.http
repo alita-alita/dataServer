@@ -1,0 +1,41 @@
+### 增加典型企业
+POST {{base_url}}/record/admin/typical/enterprise/add
+Content-Type: application/json
+token: {{token}}
+
+{
+  "version": "CHAIN.54.8",
+  "labelId": 1223,
+  "enterpriseName": "山西当代万兴置业有限公司,山西省中小企业发展融资担保有限公司,山西东辉新能有限公司,yahhhh"
+}
+
+### 更新典型企业
+POST {{base_url}}/record/admin/typical/enterprise/update
+Content-Type: application/json
+token: {{token}}
+
+{
+  "id": 13,
+  "enterpriseName": "山西当代万兴置业有限公司",
+  "enterpriseUniCode": "91140100MA0GWCFE9X"
+}
+
+### 删除典型企业
+GET {{base_url}}/record/admin/typical/enterprise/delete?id=13
+Content-Type: application/json
+token: {{token}}
+
+### 查询典型企业
+POST {{base_url}}/record/admin/typical/enterprise/page
+Content-Type: application/json
+token: {{token}}
+
+{
+  "version": "CHAIN.54.8",
+  "labelId": 1223
+}
+
+### 典型企业加入疑似企业
+GET {{base_url}}/record/admin/typical/enterprise/addAllToSuspected?version=CHAIN.54.8
+Content-Type: application/json
+token: {{token}}

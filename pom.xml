@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>pom</packaging>
+	<modules>
+		<module>starter</module>
+		<module>api</module>
+        <module>infrastructment</module>
+		<module>service</module>
+        <module>provider-api</module>
+    </modules>
+<!--	<parent>-->
+<!--		<groupId>org.springframework.boot</groupId>-->
+<!--		<artifactId>spring-boot-starter-parent</artifactId>-->
+<!--		<version>2.3.2.RELEASE</version>-->
+<!--		<relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
+<!--	</parent>-->
+
+	<parent>
+		<groupId>cn.idicc.common</groupId>
+		<artifactId>common-parent</artifactId>
+		<version>1.0.1-RELEASE</version>
+		<relativePath/>
+	</parent>
+
+	<groupId>cn.idicc.taotie</groupId>
+	<artifactId>taotie</artifactId>
+	<version>0.0.7-SNAPSHOT</version>
+	<name>taotie</name>
+	<description></description>
+	<properties>
+		<java.version>1.8</java.version>
+		<project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<dubbo.version>2.7.8</dubbo.version>
+		<component-login.version>2.3.4.12-SNAPSHOT</component-login.version>
+		<identity.version>2.3.6.17-SNAPSHOT</identity.version>
+		<taotie.version>0.0.7-SNAPSHOT</taotie.version>
+		<dashscope.version>2.18.2</dashscope.version>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>1.2.11</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+<!--		xxl-jobMAVEN依赖-->
+		<dependency>
+			<groupId>com.xuxueli</groupId>
+			<artifactId>xxl-job-core</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>cn.idicc.taotie</groupId>
+				<artifactId>api</artifactId>
+				<version>${taotie.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cn.idicc.taotie</groupId>
+				<artifactId>infrastructment</artifactId>
+				<version>${taotie.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cn.idicc.taotie</groupId>
+				<artifactId>provider-api</artifactId>
+				<version>${taotie.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cn.idicc.taotie</groupId>
+				<artifactId>service</artifactId>
+				<version>${taotie.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cn.idicc.taotie</groupId>
+				<artifactId>starter</artifactId>
+				<version>${taotie.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>cn.idicc.identity</groupId>
+				<artifactId>identity-sso-rpc</artifactId>
+				<version>${identity.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>cn.idicc.component.login</groupId>
+				<artifactId>component-login-provider</artifactId>
+				<version>${component-login.version}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>mybatis-plus-annotation</artifactId>
+						<groupId>com.baomidou</groupId>
+					</exclusion>
+					<exclusion>
+						<artifactId>mybatis-plus-extension</artifactId>
+						<groupId>com.baomidou</groupId>
+					</exclusion>
+					<exclusion>
+						<artifactId>identity-sso-rpc</artifactId>
+						<groupId>cn.idicc.identity</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>com.alibaba</groupId>
+				<artifactId>dashscope-sdk-java</artifactId>
+				<version>${dashscope.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-api</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>org.slf4j</groupId>
+						<artifactId>slf4j-simple</artifactId>
+					</exclusion>
+					<exclusion>
+						<groupId>com.google.code.gson</groupId>
+						<artifactId>gson</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>2.10.1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>

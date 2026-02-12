@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordAiCheckRecordMapper">
+
+    <select id="page" resultType="cn.idicc.taotie.infrastructment.response.icm.RecordAiCheckRecordDTO">
+        select *
+        from record_ai_check_record racr
+        where racr.deleted = 0
+          <if test="chainId != null">
+              and racr.chain_id =#{chainId}
+          </if>
+        order by racr.gmt_modify desc
+    </select>
+</mapper>

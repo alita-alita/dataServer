@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 1.在mybats的开发中namespace有特殊的意思，一定要是对应接口的全限定名通过namespace可以简历mapper.xml和接口之间的关系(名字不重要，位置不重要)-->
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.spider.KeywordMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="keywordMap" type="cn.idicc.taotie.infrastructment.entity.spider.Keyword">
+        <id     property="keywordId"               column="keyword_id" />
+        <result property="keywordName"             column="keyword_name" />
+        <result property="keywordTaskCode"         column="keyword_taskCode"/>
+        <result property="keywordSearchWord"       column="keyword_searchWord"/>
+        <result property="keywordPlatform"         column="keyword_platform"/>
+        <result property="keywordMode"             column="keyword_mode"/>
+        <result property="keywordPublicAccountUrl" column="keyword_publicAccountUrl"/>
+        <result property="keywordNewsSource"       column="keyword_newsSource"/>
+        <result property="keywordIndustryName"     column="keyword_industryName"/>
+        <result property="keywordUniCode"          column="keyword_uniCode"/>
+        <result property="keywordState"            column="keyword_state"/>
+        <result property="keywordTime"             column="keyword_time"/>
+        <result property="keywordCycle"            column="keyword_cycle"/>
+        <result property="keywordNextTime"         column="keyword_nextTime"/>
+        <result property="distinguish"             column="distinguish"/>
+        <result property="deleted"                 column="deleted"/>
+    </resultMap>
+
+    <resultMap id="KeywordKafkaMap" type="cn.idicc.taotie.infrastructment.entity.spider.KeywordKafka">
+        <id property="uniKey"  column="keyword_id" />
+        <result property="keyword" column="keyword_name"/>
+        <result property="taskCode" column="keyword_taskcode"/>
+        <result property="searchWord" column="keyword_searchWord"/>
+        <result property="platform" column="keyword_platform"/>
+        <result property="collectType" column="keyword_mode"/>
+        <result property="publicAccountUrl" column="keyword_publicAccountUrl"/>
+        <result property="newsSource" column="keyword_newsSource"/>
+        <result property="searchedIndustryName" column="keyword_industryName"/>
+        <result property="uniCode" column="keyword_unicode"/>
+        <result property="cycle" column="keyword_cycle"/>
+    </resultMap>
+
+    <sql id="KeywordSql">
+        SELECT
+            keyword_id, keyword_name,keyword_taskCode,keyword_searchWord,
+            keyword_platform,keyword_mode,keyword_publicAccountUrl,keyword_newsSource,
+            keyword_industryName,keyword_uniCode,keyword_state, keyword_time,
+            keyword_cycle, keyword_nextTime, distinguish, deleted
+            FROM keyword
+    </sql>
+
+    <sql id="KeywordGatherSql">
+        SELECT keyword_id, keyword_name,keyword_taskCode,keyword_searchWord,
+               keyword_platform,keyword_mode,keyword_publicAccountUrl,
+               keyword_newsSource,keyword_industryName,keyword_uniCode,keyword_cycle
+        FROM keyword
+    </sql>
+
+    <!--
+     * 根据 关键词名称 采集模式 查找关键词
+     * 关键词展示列表
+     * 关键词采集类型做区分
+     */-->
+    <select id="listKeyword" resultMap="keywordMap">
+        <include refid="KeywordSql"/>
+        <where>
+            <if test="keywordName != null and keywordName != ''">
+                AND INSTR(keyword_name, #{keywordName})
+            </if>
+            <if test="keywordMode != null and keywordMode!= ''">
+                AND keyword_mode = #{keywordMode}
+            </if>
+            <if test="keywordState != null">
+                AND keyword_state = #{keywordState}
+            </if>
+            <if test="keywordNewsSource!=null and keywordNewsSource!=''">
+                AND INSTR(keyword_newsSource,#{keywordNewsSource})
+            </if>
+            AND keyword_taskcode=#{keywordTaskCode}
+            AND distinguish = #{distinguish}
+            AND deleted=0
+        </where>
+        ORDER BY keyword_time DESC
+    </select>
+
+
+    <!--自动采集 维护关键词 -->
+    <select id="maintenanceAutomatic" resultMap="KeywordKafkaMap">
+        <include refid="KeywordGatherSql"/>
+        WHERE keyword_id  IN
+        <foreach collection="keywordIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        AND deleted=0
+    </select>
+
+
+    <!-- 手动采集  按照关键字主键进行采集 -->
+    <select id="manualGather" resultMap="KeywordKafkaMap">
+        <include refid="KeywordGatherSql"/>
+        WHERE keyword_taskCode = #{keywordTaskCode}
+        AND keyword_id  IN
+        <foreach collection="keywordIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        AND distinguish= #{distinguish}
+        AND deleted=0
+    </select>
+
+    <!--关键词搜索词唯一校验-->
+    <select id="isKeywordExists" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM keyword
+        WHERE keyword_name = #{keyword} AND keyword_platform = #{platform} AND deleted=0
+    </select>
+
+
+    <select id="findByCollectTime" resultMap="keywordMap">
+        <include refid="KeywordGatherSql"/>
+        WHERE #{keywordNextTime} >=  keyword_nextTime
+    </select>
+
+    <!-- 添加公众号关键词-->
+    <insert id="addKeyword">
+        INSERT INTO `taotie`.`keyword`
+        (
+         `keyword_name`, `keyword_taskCode`, `keyword_searchWord`,`keyword_platform`,`keyword_mode`,
+         `keyword_publicAccountUrl`, `keyword_newsSource`, `keyword_industryName`,`keyword_uniCode`,
+         `keyword_time`, `keyword_cycle`, `keyword_nextTime`, `distinguish` )
+        VALUES
+       (<if test="keywordName != null and keywordName != ''">
+            #{keywordName},
+        </if>
+        <if test="keywordName == null or keywordName == ''">
+            NULL,
+        </if>
+
+        <if test="keywordTaskCode != null and keywordTaskCode != ''">
+            #{keywordTaskCode},
+        </if>
+        <if test="keywordTaskCode == null or keywordTaskCode == ''">
+            NULL,
+        </if>
+
+        <if test="keywordSearchWord != null and keywordSearchWord != ''">
+            #{keywordSearchWord},
+        </if>
+        <if test="keywordSearchWord == null or keywordSearchWord == ''">
+            NULL,
+        </if>
+
+        <if test="keywordPlatform != null and keywordPlatform != ''">
+            #{keywordPlatform},
+        </if>
+        <if test="keywordPlatform == null or keywordPlatform == ''">
+            NULL,
+        </if>
+
+        <if test="keywordMode != null and keywordMode != ''">
+            #{keywordMode},
+        </if>
+        <if test="keywordMode == null or keywordMode == ''">
+            NULL,
+        </if>
+
+        <if test="keywordPublicAccountUrl != null and keywordPublicAccountUrl != ''">
+            #{keywordPublicAccountUrl},
+        </if>
+        <if test="keywordPublicAccountUrl == null or keywordPublicAccountUrl == ''">
+            NULL,
+        </if>
+
+        <if test="keywordNewsSource != null and keywordNewsSource != ''">
+            #{keywordNewsSource},
+        </if>
+        <if test="keywordNewsSource == null or keywordNewsSource == ''">
+            NULL,
+        </if>
+
+        <if test="keywordIndustryName != null and keywordIndustryName != ''">
+            #{keywordIndustryName},
+        </if>
+        <if test="keywordIndustryName == null or keywordIndustryName == ''">
+            NULL,
+        </if>
+
+        <if test="keywordUniCode != null and keywordUniCode != ''">
+            #{keywordUniCode},
+        </if>
+        <if test="keywordUniCode == null or keywordUniCode == ''">
+            NULL,
+        </if>
+            NOW(),
+        <if test="keywordCycle != null ">
+            #{keywordCycle},
+        </if>
+        <if test="keywordCycle == null ">
+            NULL,
+        </if>
+
+        DATE_ADD(NOW(), INTERVAL  #{keywordCycle} DAY),
+
+        <if test="distinguish != null ">
+            #{distinguish}
+        </if>
+        );
+    </insert>
+
+    <!-- 批量添加关键词-->
+    <insert id="addKeywordBatch">
+        INSERT INTO `taotie`.`keyword`
+        (
+        `keyword_name`, `keyword_taskCode`, `keyword_searchWord`,`keyword_platform`,`keyword_mode`,
+        `keyword_publicAccountUrl`, `keyword_newsSource`, `keyword_industryName`,`keyword_uniCode`,
+        `keyword_time`, `keyword_cycle`, `keyword_nextTime`, `distinguish`
+        )
+        VALUES
+        <foreach item="item" index="index" collection="keywordDataList" separator=",">
+            (
+            <choose>
+                <when test="item.keywordName!= null and item.keywordName!= ''">
+                    #{item.keywordName}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.keywordTaskCode!= null and item.keywordTaskCode!= ''">
+                    #{item.keywordTaskCode}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.keywordSearchWord!= null and item.keywordSearchWord!= ''">
+                    #{item.keywordSearchWord}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.keywordPlatform!= null and item.keywordPlatform!= ''">
+                    #{item.keywordPlatform}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.keywordMode!= null and item.keywordMode!= ''">
+                    #{item.keywordMode}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.keywordPublicAccountUrl!= null and item.keywordPublicAccountUrl!= ''">
+                    #{item.keywordPublicAccountUrl}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.keywordNewsSource!= null and item.keywordNewsSource!= ''">
+                    #{item.keywordNewsSource}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.keywordIndustryName!= null and item.keywordIndustryName!= ''">
+                    #{item.keywordIndustryName}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.keywordUniCode!= null and item.keywordUniCode!= ''">
+                    #{item.keywordUniCode}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            NOW(),
+            <choose>
+                <when test="item.keywordCycle!= null">
+                    #{item.keywordCycle}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            DATE_ADD(NOW(), INTERVAL <choose>
+            <when test="item.keywordCycle!= null">
+                #{item.keywordCycle}
+            </when>
+            <otherwise>
+                0
+            </otherwise>
+        </choose> DAY),
+            <choose>
+                <when test="item.distinguish!= null">
+                    #{item.distinguish}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>
+            )
+        </foreach>
+    </insert>
+
+
+    <!--修改关键字-->
+    <update id="updateKeyword">
+        UPDATE keyword
+        <set>
+            <if test="keywordName != null and keywordName != '' " >
+                keyword_name = #{keywordName},
+            </if>
+            <if test="keywordMode != null and keywordName != ''">
+                keyword_mode = #{keywordMode},
+            </if>
+            <if test="keywordState != null">
+                keyword_state = #{keywordState},
+            </if>
+            <if test="keywordCycle != null">
+                keyword_cycle = #{keywordCycle}
+            </if>
+        </set>
+        WHERE keyword_id = #{keywordId}
+    </update>
+
+    <update id="updateKeywordTime">
+        UPDATE keyword SET keyword_time = NOW() ,keyword_nextTime = DATE_ADD(NOW(), INTERVAL keyword_cycle DAY) WHERE keyword_id = #{keywordId}
+    </update>
+
+    <!--逻辑删除关键字-->
+    <update id="delLogicKeyword">
+        UPDATE keyword SET deleted = 1 WHERE keyword_id = #{keywordId}
+    </update>
+
+    <update id="updateKeywordOF">
+        UPDATE keyword SET
+                           keyword_publicAccountUrl = #{keywordPublicAccountUrl},
+                      <if test="keywordName  != null and  keywordName != '' ">
+                           keyword_name = #{keywordName},
+                      </if>
+                           keyword_newsSource = #{keywordNewsSource}
+
+                  WHERE keyword_id = #{keywordId}
+    </update>
+
+    <!--删除关键字(物理删除)-->
+    <delete id="deleteKeyword">
+        DELETE FROM keyword WHERE keyword_id = #{keywordId}
+    </delete>
+
+
+
+</mapper>
+
+

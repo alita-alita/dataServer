@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 1.在mybats的开发中namespace有特殊的意思，一定要是对应接口的全限定名通过namespace可以简历mapper.xml和接口之间的关系(名字不重要，位置不重要)-->
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordBlacklistKeywordsMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="blacklistKeywordsMap" type="cn.idicc.taotie.infrastructment.entity.icm.RecordBlacklistKeywordsDO">
+        <id column="id" property="id"/>
+        <result column="blacklist_keywords_name" property="blacklistKeywordsName"/>
+        <result column="blacklist_industrial_chain" property="blacklistIndustrialChain"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+    <sql id="blacklistKeywordsSQL">
+        SELECT record_blacklist_keywords.id,
+               record_blacklist_keywords.blacklist_keywords_name,
+               record_blacklist_keywords.blacklist_industrial_chain,
+               record_industry_chain.chain_name
+        FROM record_blacklist_keywords
+        RIGHT JOIN record_industry_chain
+        ON record_industry_chain.biz_id = record_blacklist_keywords.blacklist_industrial_chain
+        </sql>
+
+    <select id="selectAll" resultMap="blacklistKeywordsMap">
+        <include refid="blacklistKeywordsSQL"/>
+        WHERE record_industry_chain.biz_id = #{blacklistIndustrialChain}
+        AND record_blacklist_keywords.deleted = 0
+    </select>
+
+    <insert id="addRecordBlacklistKeywords">
+        INSERT INTO `record_blacklist_keywords`
+         ( `blacklist_keywords_name`, `blacklist_industrial_chain`)
+        VALUES
+         ( #{do.blacklistKeywordsName}, #{do.blacklistIndustrialChain})
+        ON DUPLICATE KEY UPDATE
+            blacklist_keywords_name=VALUES(blacklist_keywords_name),
+            blacklist_industrial_chain = VALUES(blacklist_industrial_chain)
+    </insert>
+
+    <update id="deleteRecordBlacklistKeywords">
+        UPDATE `record_blacklist_keywords` SET `deleted` = 1
+          WHERE `id` IN  <foreach collection="ids" item="id" open="(" separator="," close=")">
+                             #{id}
+                         </foreach>
+                         AND `deleted` = 0;
+    </update>
+
+
+
+
+
+
+
+
+</mapper>

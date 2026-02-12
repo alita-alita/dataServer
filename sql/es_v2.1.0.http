@@ -1,0 +1,23 @@
+### 产业知识库
+PUT dev_industry_chain_product_embedding
+
+{
+    "mappings": {
+        "properties": {
+            "id": { "type": "keyword" },
+            "lib_file_id": { "type": "keyword" },
+            "chain_id": { "type": "long" },
+            "chain_name": { "type": "keyword" },
+            "type": { "type": "integer" },
+            "product_name": {
+                "type": "text",
+                "fields": { "keyword": { "type": "keyword", "ignore_above": 256 } }
+            },
+            "product_desc": { "type": "text" },
+            "product_way": {
+                "type": "text"
+            },
+            "vector": { "type": "dense_vector", "dims": 1024 }
+        }
+    }
+}

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordAgentProductMatchesMapper">
+
+    <select id="productAllCount" resultType="java.lang.Long">
+        select count(t.id)
+        from record_agent_product_matches t
+        WHERE t.file_id = #{file_id}
+    </select>
+    <select id="productMatchCount" resultType="java.lang.Long">
+        select count(t.id)
+        from record_agent_product_matches t
+        WHERE t.file_id = #{file_id} and t.status in (2,3)
+    </select>
+
+
+
+    <select id="getResultMatch" resultType="cn.idicc.taotie.infrastructment.dto.ProductMatchesDTO">
+        select apm.product_id,
+               apm.product_name,
+               apm.matched_product_score,
+               ap.product_url,
+               ap.enterprise_id,
+               de.enterprise_name,
+               ap.enterprise_uni_code,
+               ricn.biz_id as industryChainNodeId,
+               ricn.node_name as industryChainNodeName,
+               ricn.chain_id as industryChainId,
+               dicilr.biz_id as industryLabelId,
+               dicilr.label_name as industryLabelName
+        from record_agent_product_matches apm
+                 inner join record_app_product ap
+                            on apm.product_id = ap.biz_id COLLATE utf8mb4_general_ci
+                 inner join record_industry_label dicilr
+                            on apm.matched_product = dicilr.label_name and dicilr.chain_id = apm.industry_chain_id and dicilr.version = #{version}
+                                <if test="label_ids != null and label_ids.size() > 0">
+                                    and dicilr.biz_id in
+                                    <foreach collection="label_ids" separator="," open="(" close=")" item="label_id">
+                                        #{label_id}
+                                    </foreach>
+                                </if>
+                 inner join record_industry_chain_node_label_relation ricnlr
+                            on ricnlr.industry_label_id = dicilr.biz_id  and ricnlr.version = #{version}
+                 inner join record_industry_chain_node ricn
+                            on ricnlr.chain_node_id = ricn.biz_id and ricn.chain_id = apm.industry_chain_id and ricn.version = #{version}
+                 inner join record_app_enterprise_industry_chain_suspected de
+                            on ap.enterprise_id = de.enterprise_id and de.industry_chain_id = apm.industry_chain_id and de.negative = 0
+        where apm.industry_chain_id = #{chainId}
+          and apm.file_id = #{fileId}
+          and apm.status = 2
+        <if test="is_limit_score != null and is_limit_score == true">
+            and apm.matched_product_score > ricn.threshold_score
+        </if>
+        order by apm.id
+    </select>
+    <select id="getResultMatchPage" resultType="cn.idicc.taotie.infrastructment.dto.ProductMatchesDTO">
+        select apm.product_id,
+                apm.product_name,
+                apm.matched_product as industryLabelName,
+                apm.matched_product_score,
+                apm.extra_reason,
+                ap.product_url,
+                ap.product_description,
+                ap.product_purpose,
+                ap.enterprise_id,
+                ap.enterprise_uni_code
+        from record_agent_product_matches apm
+            inner join record_app_product ap
+                on apm.product_id = ap.biz_id COLLATE utf8mb4_general_ci
+        where apm.industry_chain_id = #{chainId}
+            and apm.status = 2
+            order by apm.id
+    </select>
+
+    <delete id="deleteByChainIdAndMatchProduct" parameterType="map">
+        delete from deleteByChainIdAndMatchProduct
+        where industry_chain_id in
+        <foreach collection="chainIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and match_product = #{labelName}
+    </delete>
+
+</mapper>

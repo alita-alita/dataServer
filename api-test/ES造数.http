@@ -1,0 +1,11 @@
+### GET request to example server
+POST http://192.168.0.214:9200/dwd_enterprise/_doc/299026
+Content-Type: application/json
+
+{
+  "uni_code": "91650502MA7HT24202",
+  "enterprise_name": "新疆通联物流有限公司"
+}
+
+###
+GET http://192.168.0.214:9200/dwd_enterprise/_search

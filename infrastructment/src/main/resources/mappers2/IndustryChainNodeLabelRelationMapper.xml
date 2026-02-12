@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.data.IndustryChainNodeLabelRelationMapper">
+
+    <select id="getLabelNameByNodeId" resultType="java.lang.String">
+        select t2.label_name
+        from industry_chain_node_label_relation t1
+        inner join industry_label t2 on t1.industry_label_id = t2.id and t2.deleted=0
+        where t1.chain_node_id = #{nodeId} and t1.deleted=0
+    </select>
+</mapper>

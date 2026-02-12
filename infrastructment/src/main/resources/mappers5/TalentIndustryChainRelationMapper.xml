@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.xiaoai.TalentIndustryChainRelationMapper">
+
+    <select id="selectByTalent" resultType="cn.idicc.taotie.infrastructment.entity.data.IndustryChainDO"
+            parameterType="java.lang.String">
+        select ic.*
+        from talent_industry_chain_relation ticr
+                 inner join industry_chain ic on ic.id = ticr.chain_id
+        where ticr.talent_md5 = #{talent_md5}
+        group by ic.id
+    </select>
+</mapper>

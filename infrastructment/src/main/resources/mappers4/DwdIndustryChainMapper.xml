@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.dw.DwdIndustryChainMapper">
+
+    <insert id="insertOnDuplicate">
+           INSERT INTO dwd_industry_chain
+           (id, industry_chain_code, industry_chain_name, industry_chain_name_pinyin, notes, former_name, icon, deleted,gmt_create,gmt_modify,create_by, update_by, data_source)
+              VALUES
+            <foreach collection ="dos" item="do" separator =",">
+                (#{do.id}, #{do.industryChainCode}, #{do.industryChainName}, #{do.industryChainNamePinyin}, #{do.notes}, #{do.formerName}, #{do.icon},#{do.deleted}, #{do.gmtCreate}, #{do.gmtModify},#{do.createBy}, #{do.updateBy}, #{do.dataSource})
+            </foreach>
+           ON DUPLICATE KEY UPDATE
+                                industry_chain_code = values(industry_chain_code),
+                                industry_chain_name = values(industry_chain_name),
+                                industry_chain_name_pinyin = values(industry_chain_name_pinyin),
+                                notes = values(notes),
+                                former_name = values(former_name),
+                                icon = values(icon),
+                                data_source = values(data_source),
+                                deleted = VALUES(deleted),
+                                gmt_create = VALUES(gmt_create),
+                                gmt_modify = VALUES(gmt_modify),
+                                create_by = VALUES(create_by),
+                                update_by = VALUES(update_by)
+    </insert>
+</mapper>

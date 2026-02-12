@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.SyncTaskMapper">
+
+    <update id="updateTaskLock">
+        update sync_task st
+        set st.is_lock = #{is_lock}
+        where st.id = #{id}
+    </update>
+</mapper>

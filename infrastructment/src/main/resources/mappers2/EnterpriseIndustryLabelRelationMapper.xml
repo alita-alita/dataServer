@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.data.EnterpriseIndustryLabelRelationMapper">
+    <select id="selectIdByChainId" resultType="java.lang.Long" parameterType="java.lang.Long">
+        select distinct eilr.enterprise_id
+        from enterprise_industry_label_relation eilr
+        inner join industry_label il on il.id = eilr.label_id
+        inner join `industry_chain_node_label_relation` t3 on il.`id` = t3.`industry_label_id`
+        inner join `industry_chain_node` t4 on t3.`chain_node_id` = t4.`id`
+            and t4.chain_id = #{chain_id}
+            and il.`deleted` = 0 and t3.`deleted` = 0 and eilr.`deleted` = 0
+    </select>
+    <select id="selectByIdWithDeleted"
+            resultType="cn.idicc.taotie.infrastructment.entity.data.EnterpriseIndustryLabelRelationDO"
+            parameterType="java.lang.Long">
+        select *
+        from enterprise_industry_label_relation
+        where id = #{id}
+    </select>
+</mapper>

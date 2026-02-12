@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 1.在mybats的开发中namespace有特殊的意思，一定要是对应接口的全限定名通过namespace可以简历mapper.xml和接口之间的关系(名字不重要，位置不重要)-->
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.spider.OfficialWebsiteMapper">
+  <resultMap id="officialWebsiteMap" type="cn.idicc.taotie.infrastructment.entity.spider.OfficialWebsite">
+       <id property="officialWebsiteId" column="official_website_id"/>
+       <result property="officialWebsiteEnterpriseId" column="official_website_enterpriseid"/>
+       <result property="officialWebsiteName" column="official_website_name"/>
+       <result property="officialWebsiteUniCode" column="official_website_uniCode"/>
+       <result property="officialWebsiteUrl" column="official_website_url"/>
+       <result property="officialWebsiteTaskCode" column="official_website_taskCode"/>
+       <result property="officialWebsitePlatform" column="official_website_platform"/>
+       <result property="officialWebsiteTime" column="official_website_time"/>
+       <result property="officialWebsiteState" column="official_website_state"/>
+       <result property="officialWebsiteCycle" column="official_website_cycle"/>
+       <result property="officialWebsiteNextTime" column="official_website_nextTime"/>
+       <result property="deleted" column="deleted"/>
+  </resultMap>
+
+    <resultMap id="officialWebsiteKafkaMap" type="cn.idicc.taotie.infrastructment.entity.spider.OfficialWebsiteKafka">
+        <id property="uniKey" column="official_website_id"/>
+        <result property="taskCode" column="official_website_taskCode"/>
+        <result property="platform" column="official_website_platform"/>
+        <result property="enterpriseId" column="official_website_enterpriseid"/>
+        <result property="enterpriseName" column="official_website_name"/>
+        <result property="uniCode" column="official_website_uniCode"/>
+        <result property="publicAccountUrl" column="official_website_url"/>
+
+    </resultMap>
+
+    <sql id="officialWebsiteSql">
+        SELECT official_website_id, official_website_enterpriseid, official_website_name,
+               official_website_uniCode, official_website_url, official_website_taskCode,
+               official_website_platform,official_website_state, official_website_time,
+               official_website_cycle, official_website_nextTime , deleted
+        FROM official_website
+    </sql>
+
+    <sql id="officialWebsiteKafkaSql">
+        SELECT official_website_id, official_website_taskCode, official_website_platform,
+               official_website_enterpriseid, official_website_name, official_website_uniCode,
+               official_website_url,official_website_cycle
+        FROM official_website
+    </sql>
+
+    <select id="listOfficialWebsite" resultMap="officialWebsiteMap">
+        <include refid="officialWebsiteSql"/>
+        <where>
+            <if test="officialWebsiteName!=null and officialWebsiteName!=''">
+                AND INSTR(official_website_name, #{officialWebsiteName})
+            </if>
+            <if test="officialWebsiteState!=null">
+                AND official_website_state = #{officialWebsiteState}
+            </if>
+                AND deleted=0
+        </where>
+        ORDER BY  official_website_time DESC
+    </select>
+
+    <select id="manualGather" resultMap="officialWebsiteKafkaMap">
+      <include refid="officialWebsiteKafkaSql"/>
+        WHERE official_website_id  IN
+        <foreach collection="officialWebsiteId" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        AND deleted=0
+    </select>
+
+    <select id="findByCollectTime" resultMap="officialWebsiteMap">
+        <include refid="officialWebsiteKafkaSql"/>
+         WHERE #{officialWebsiteNextTime} >=  official_website_nextTime
+         AND deleted=0
+    </select>
+
+    <insert id="addOfficialWebsite">
+        INSERT INTO `taotie`.`official_website`
+        (`official_website_enterpriseid`, `official_website_name`, `official_website_uniCode`, `official_website_url`,
+        `official_website_taskCode`, `official_website_platform`, `official_website_time`, `official_website_cycle`,
+        `official_website_nextTime`)
+        VALUES
+        (
+        <if test="officialWebsiteEnterpriseId!= null and  officialWebsiteEnterpriseId!= ''">
+            #{officialWebsiteEnterpriseId},
+        </if>
+        <if test="officialWebsiteEnterpriseId == null or officialWebsiteEnterpriseId ==''">
+            NULL,
+        </if>
+        <if test="officialWebsiteName!= null and  officialWebsiteName!= ''">
+            #{officialWebsiteName},
+        </if>
+        <if test="officialWebsiteName == null or officialWebsiteName ==''">
+            NULL,
+        </if>
+        <if test="officialWebsiteUniCode!= null and  officialWebsiteUniCode!= ''">
+            #{officialWebsiteUniCode},
+        </if>
+        <if test="officialWebsiteUniCode == null or officialWebsiteUniCode ==''">
+            NULL,
+        </if>
+        <if test="officialWebsiteUrl!= null and  officialWebsiteUrl!= ''">
+            #{officialWebsiteUrl},
+        </if>
+        <if test="officialWebsiteUrl == null or officialWebsiteUrl ==''">
+            NULL,
+        </if>
+        <if test="officialWebsiteTaskCode!= null and  officialWebsiteTaskCode!= ''">
+            #{officialWebsiteTaskCode},
+        </if>
+        <if test="officialWebsiteTaskCode == null or officialWebsiteTaskCode ==''">
+            NULL,
+        </if>
+        <if test="officialWebsitePlatform!= null and  officialWebsitePlatform!= ''">
+            #{officialWebsitePlatform},
+        </if>
+        <if test="officialWebsitePlatform == null or officialWebsitePlatform ==''">
+            NULL,
+        </if>
+        NOW(),
+        <if test=" officialWebsiteCycle!= null">
+            #{officialWebsiteCycle},
+        </if>
+        <if test=" officialWebsiteCycle == null">
+            NULL,
+        </if>
+            DATE_ADD(NOW(), INTERVAL #{officialWebsiteCycle} DAY)
+        )
+    </insert>
+
+
+    <insert id="addOfficialWebsiteBatch">
+        INSERT INTO `taotie`.`official_website`
+        (`official_website_enterpriseid`, `official_website_name`, `official_website_uniCode`, `official_website_url`,
+        `official_website_taskCode`, `official_website_platform`, `official_website_time`,`official_website_cycle`,
+        `official_website_nextTime`)
+        VALUES
+        <foreach item="item" index="index" collection="officialWebsiteDataList" separator=",">
+        (
+            <choose>
+                <when test="item.officialWebsiteEnterpriseId != null and item.officialWebsiteEnterpriseId != ''">
+                    #{item.officialWebsiteEnterpriseId}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.officialWebsiteName != null and item.officialWebsiteName != ''">
+                    #{item.officialWebsiteName}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.officialWebsiteUniCode != null and item.officialWebsiteUniCode != ''">
+                    #{item.officialWebsiteUniCode}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.officialWebsiteUrl != null and item.officialWebsiteUrl != ''">
+                    #{item.officialWebsiteUrl}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.officialWebsiteTaskCode != null and item.officialWebsiteTaskCode != ''">
+                    #{item.officialWebsiteTaskCode}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            <choose>
+                <when test="item.officialWebsitePlatform != null and item.officialWebsitePlatform != ''">
+                    #{item.officialWebsitePlatform}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            NOW(),
+            <choose>
+                <when test="item.officialWebsiteCycle != null">
+                    #{item.officialWebsiteCycle}
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+          DATE_ADD(NOW(), INTERVAL  #{item.officialWebsiteCycle} DAY)
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateOfficialWebsite">
+        UPDATE `taotie`.`official_website`
+            <set>
+            <if test="officialWebsiteEnterpriseId != null and  officialWebsiteEnterpriseId != ''">
+                `official_website_enterpriseid` = #{officialWebsiteEnterpriseId},
+            </if>
+            <if test="officialWebsiteName != null and  officialWebsiteName != ''">
+                `official_website_name` = #{officialWebsiteName},
+            </if>
+            <if test="officialWebsiteUniCode != null and  officialWebsiteUniCode != ''">
+                `official_website_uniCode` = #{officialWebsiteUniCode},
+            </if>
+            <if test="officialWebsiteUrl != null and  officialWebsiteUrl != ''">
+                `official_website_url` = #{officialWebsiteUrl},
+            </if>
+            <if test="officialWebsiteState != null">
+                `official_website_state` = #{officialWebsiteState},
+            </if>
+            <if test="officialWebsiteCycle != null">
+                `official_website_cycle` = #{officialWebsiteCycle},
+            </if>
+          </set>
+             WHERE `official_website_id` = #{officialWebsiteId}
+    </update>
+
+
+    <update id="updateOfficialWebsiteTime">
+        UPDATE `taotie`.`official_website` SET
+                           `official_website_time` = NOW() ,
+                           `official_website_nextTime` = DATE_ADD(NOW(),INTERVAL official_website_cycle DAY),
+                           `official_website_state`= 1
+                           WHERE official_website_id = #{officialWebsiteId}
+    </update>
+
+    <update id="delLogicOfficialWebsite">
+        UPDATE `taotie`.`official_website` SET deleted = 1  WHERE official_website_id = #{officialWebsiteId}
+    </update>
+
+
+
+
+   </mapper>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordAppEnterpriseIndustryChainSuspectedMapper">
+    <resultMap id="BaseResultMap" type="cn.idicc.taotie.infrastructment.entity.icm.RecordAppEnterpriseIndustryChainSuspectedDO">
+        <result column="biz_id" jdbcType="VARCHAR" property="bizId"/>
+        <result column="enterprise_id" jdbcType="VARCHAR" property="enterpriseId"/>
+        <result column="enterprise_name" jdbcType="VARCHAR" property="enterpriseName"/>
+        <result column="enterprise_uni_code" jdbcType="VARCHAR" property="enterpriseUniCode"/>
+        <result column="industry_chain_id" jdbcType="INTEGER" property="industryChainId"/>
+        <result column="industry_chain_name" jdbcType="VARCHAR" property="industryChainName"/>
+        <result column="data_source" jdbcType="VARCHAR" property="dataSource"/>
+    </resultMap>
+    <sql id="baseResultSQL">
+        SELECT record_app_enterprise_industry_chain_suspected.biz_id,enterprise_id,enterprise_name, enterprise_uni_code,industry_chain_id,
+               industry_chain_name,negative,data_source,record_app_enterprise_industry_chain_suspected.gmt_create
+        FROM  record_app_enterprise_industry_chain_suspected
+
+    </sql>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+    <include refid="baseResultSQL"/>
+        <where>
+            <if test="enterpriseName != null and enterpriseName != ''">
+                AND enterprise_name LIKE CONCAT('%',#{enterpriseName},'%')
+            </if>
+            <if test="industryChainId != null">
+                AND record_app_enterprise_industry_chain_suspected.industry_chain_id = #{industryChainId}
+            </if>
+           AND  record_app_enterprise_industry_chain_suspected.`deleted`= 0
+        </where>
+           ORDER BY record_app_enterprise_industry_chain_suspected.id DESC
+    </select>
+
+    <select id="selectPositive"
+            resultType="cn.idicc.taotie.infrastructment.entity.icm.RecordAppEnterpriseIndustryChainSuspectedDO">
+        select raeics.enterprise_id,raeics.enterprise_name,raeics.enterprise_uni_code
+        from record_app_enterprise_industry_chain_suspected raeics
+        where raeics.industry_chain_id = #{chain_id}
+            and raeics.negative = 0
+            and deleted = 0
+            and raeics.enterprise_uni_code in
+        <foreach collection="uni_codes" separator="," open="(" close=")" item="uni_code">
+            #{uni_code}
+        </foreach>
+    </select>
+    <select id="isNegative" resultType="java.lang.Boolean" parameterType="java.lang.String">
+        select COUNT(1) > 0 from record_blacklist_keywords
+        where #{enterpriseName} like  concat('%',blacklist_keywords_name,'%')
+        limit 1
+    </select>
+
+
+    <insert id="addBatchRecordAppEnterpriseIndustryChainSuspected">
+        INSERT INTO `record_app_enterprise_industry_chain_suspected`
+        (`biz_id`, `enterprise_id`, `enterprise_name`, `enterprise_uni_code`, `industry_chain_id`,
+        `industry_chain_name`,`data_source`,  `negative`)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+          (
+                <choose>
+                    <when test="(item.enterpriseId != null or item.enterpriseId != '')
+                            and item.industryChainId != null">
+                        MD5(CONCAT(#{item.enterpriseId}, #{item.industryChainId})),
+                    </when>
+                    <otherwise>
+                        NULL,
+                    </otherwise>
+                </choose>
+
+                <if test="item.enterpriseId != null and item.enterpriseId != ''">
+                    #{item.enterpriseId},
+                </if>
+                <if test="item.enterpriseId == null or item.enterpriseId == ''">
+                    NULL,
+                </if>
+
+                <if test="item.enterpriseName != null and item.enterpriseName != ''">
+                    #{item.enterpriseName},
+                </if>
+                <if test="item.enterpriseName == null or item.enterpriseName == ''">
+                    NULL,
+                </if>
+
+                <if test="item.enterpriseUniCode != null and item.enterpriseUniCode != ''">
+                    #{item.enterpriseUniCode},
+                </if>
+                <if test="item.enterpriseUniCode == null or item.enterpriseUniCode == ''">
+                    NULL,
+                </if>
+
+                <if test="item.industryChainId != null">
+                    #{item.industryChainId},
+                </if>
+                <if test="item.industryChainId == null">
+                    NULL,
+                </if>
+
+                <if test="item.industryChainName != null and item.industryChainName != ''">
+                    #{item.industryChainName},
+                </if>
+                <if test="item.industryChainName == null or item.industryChainName == ''">
+                    NULL,
+                </if>
+
+                <if test="item.dataSource != null and item.dataSource != ''">
+                    #{item.dataSource},
+                </if>
+                <if test="item.dataSource == null or item.dataSource == ''">
+                    NULL,
+                </if>
+
+                <if test="item.negative != null">
+                    #{item.negative}
+                </if>
+                <if test="item.negative == null">
+                    NULL
+                </if>
+        )
+        </foreach>
+        ON DUPLICATE KEY UPDATE biz_id= VALUES(biz_id),enterprise_id = VALUES(enterprise_id),
+                                enterprise_name = VALUES(enterprise_name),enterprise_uni_code = VALUES(enterprise_uni_code),
+                                industry_chain_id = VALUES(industry_chain_id),industry_chain_name= VALUES(industry_chain_name),
+                                data_source = VALUES(data_source),negative = VALUES(negative)
+    </insert>
+
+
+
+    <update id="deleteRecordAppEnterpriseIndustryChainSuspected">
+        delete from  `record_app_enterprise_industry_chain_suspected`
+        WHERE `biz_id` = #{bizId}
+    </update>
+
+
+    <update id="updateNegative">
+        update `record_app_enterprise_industry_chain_suspected`
+        SET  `negative` = 1
+        WHERE
+            enterprise_name LIKE CONCAT('%', #{enterpriseName}, '%') and
+            industry_chain_id = #{industryChainId}
+    </update>
+
+
+    <update id="setStatusInitByEnterpriseIds" parameterType="map" >
+        update record_app_enterprise_industry_chain_suspected
+        set status = 0
+        where enterprise_id in
+        <foreach collection="enterpriseIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+
+</mapper>

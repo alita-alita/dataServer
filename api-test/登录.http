@@ -1,0 +1,47 @@
+### 公钥
+GET {{pangu_base_url}}/sso/admin/user/login/publicKey
+Content-Type: application/json
+
+> {% client.global.set("public_key", response.body.result); %}
+
+### 登录
+< {%
+    import {forge} from './forge'
+    const public_key = '-----BEGIN PUBLIC KEY-----\n'+
+        'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC27tAIp7i+qhyunO+O5xvk5ilVR9npOkrfeJB69OtafL1i3ZjXNct0gxZF09WRCzWCOkLzG0rcKzWaFieWRscci5pAHqSzfld5Qob6e3BVgI+BtJcge4NOGtMN8ASEMXBUdzhuo1ud0VQUqVjDcBMqQMKtsyIpBh+onZH8jqXz/wIDAQAB\n' +
+        '-----END PUBLIC KEY-----'
+    var publicKey = forge.pki.publicKeyFromPem(public_key);
+    var password = "abcd123456"
+
+    //rsa加密得到签名
+    var encryptedText = forge.util.encode64(publicKey.encrypt(password, 'RSAES-PKCS1-V1_5', {
+        md: forge.md.sha1.create(),
+        mgf1: {
+            md: forge.md.sha1.create()
+        }
+    }));
+    request.variables.set("password",encryptedText)
+ %}
+POST {{pangu_base_url}}/sso/admin/login
+Content-Type: application/json
+appid: 12
+
+{
+	"username": "18857143103",
+    "password": "{{password}}"
+}
+
+> {%
+    client.global.set("token", response.body.result.token);
+    client.global.set("userId", response.body.result.userId);
+%}
+
+### 机构清单
+GET {{pangu_base_url}}/sso/admin/institution/ownList
+token: {{token}}
+
+### 切换机构
+GET {{pangu_base_url}}/sso/admin/institution/renew?orgCode=X01P189G
+token: {{token}}
+
+

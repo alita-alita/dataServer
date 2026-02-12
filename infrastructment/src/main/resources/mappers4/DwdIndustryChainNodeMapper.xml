@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.dw.DwdIndustryChainNodeMapper">
+
+    <insert id="insertOnDuplicate">
+              INSERT INTO dwd_industry_chain_node
+              (id,
+               industry_chain_id, industry_chain_name,
+               node_name, line_info,
+               ordinate_value,abscissa_value,
+               tache,down_node_id,up_node_id,
+               node_virtual_location,node_type, chain_node_introduce,
+               node_order,node_level,node_parent_id,
+               is_leaf,show_max_number,
+               deleted,gmt_create,gmt_modify,create_by, update_by, data_source)
+                  VALUES
+                <foreach collection ="dos" item="do" separator =",">
+                 (#{do.id},
+                  #{do.industryChainId}, #{do.industryChainName},
+                  #{do.nodeName}, #{do.lineInfo},
+                  #{do.ordinateValue},#{do.abscissaValue},
+                  #{do.tache},#{do.downNodeId},#{do.upNodeId},
+                  #{do.nodeVirtualLocation}, #{do.nodeType},#{do.chainNodeIntroduce},
+                  #{do.nodeOrder},#{do.nodeLevel},#{do.nodeParentId},
+                  #{do.isLeaf},#{do.showMaxNumber},
+                  #{do.deleted}, #{do.gmtCreate}, #{do.gmtModify},#{do.createBy}, #{do.updateBy}, #{do.dataSource})
+                </foreach>
+              ON DUPLICATE KEY UPDATE
+                                    industry_chain_id = values(industry_chain_id),
+                                    industry_chain_name = values(industry_chain_name),
+                                    node_name = values(node_name),
+                                    line_info = values(line_info),
+                                    ordinate_value = values(abscissa_value),
+                                    tache = values(tache),
+                                    down_node_id = values(down_node_id),
+                                    up_node_id = values(up_node_id),
+                                    node_virtual_location = values(node_virtual_location),
+                                    node_type = values(node_type),
+                                    chain_node_introduce = values(chain_node_introduce),
+                                    node_order = values(node_order),
+                                    node_level = values(node_level),
+                                    node_parent_id = values(node_parent_id),
+                                    is_leaf = values(is_leaf),
+                                    show_max_number = values(show_max_number),
+                                    deleted = VALUES(deleted),
+                                    gmt_create = VALUES(gmt_create),
+                                    gmt_modify = VALUES(gmt_modify),
+                                    create_by = VALUES(create_by),
+                                    update_by = VALUES(update_by)
+    </insert>
+</mapper>

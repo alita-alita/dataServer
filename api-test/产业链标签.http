@@ -1,0 +1,6 @@
+### GET request to example server
+GET {{base_url}}/record/admin/industryLabel/pageList?labelName=电池&pageNum=1
+token: {{token}}
+appid: 12
+
+###

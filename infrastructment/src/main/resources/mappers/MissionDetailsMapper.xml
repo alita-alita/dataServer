@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 1.在mybats的开发中namespace有特殊的意思，一定要是对应接口的全限定名通过namespace可以简历mapper.xml和接口之间的关系(名字不重要，位置不重要)-->
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.spider.MissionDetailsMapper">
+    <resultMap id="missionDetailssMap" type="cn.idicc.taotie.infrastructment.entity.spider.MissionDetails">
+        <result property="missionDetailsId" column="statistic_id"/>
+        <result property="missionDetailsUninkey" column="statistic_name"/>
+        <result property="missionDetailsType" column="statistic_type"/>
+        <result property="missionDetailsModule" column="statistic_num"/>
+        <result property="missionDetailsStateTime" column="statistic_succeed"/>
+        <result property="missionDetailsEndTime" column="statistic_fail"/>
+        <result property="missionDetailsInterfaceNum" column="statistic_interface_num"/>
+        <result property="missionDetailsEssayNum" column="statistic_essay_num"/>
+        <result property="missionDetailsSucceedNum" column="statistic_succeed"/>
+        <result property="missionDetailsFailNum" column="statistic_fail"/>
+        <result property="missionDetailsSendTime" column="statistic_send_time"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+    <sql id="missionDetailsMap">
+        SELECT mission_details_id,mission_details_uninkey, mission_details_type, mission_details_module,
+            mission_details_state_time,mission_details_end_time, mission_details_interface_num, mission_details_essay_num,
+            mission_details_succeed_num, mission_details_fail_num,  mission_details_send_time,deleted FROM
+            mission_details
+    </sql>
+
+
+
+
+
+</mapper>

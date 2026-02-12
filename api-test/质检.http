@@ -1,0 +1,80 @@
+### 增加AI质检记录
+GET {{base_url}}/record/admin/ai/check/add?version=CHAIN.66.2
+Content-Type: application/json
+token: {{token}}
+
+### 分页查询列表
+POST {{base_url}}/record/admin/ai/check/page
+Content-Type: application/json
+token: {{token}}
+
+{
+  "pageSize": 10,
+  "pageNum": 1,
+  "chainName": ""
+}
+
+### 详情分页查询列表
+POST {{base_url}}/record/admin/ai/check/record/page
+Content-Type: application/json
+token: {{token}}
+
+{
+  "pageSize": 10,
+  "pageNum": 1,
+  "version": "CHAIN.54.9",
+  "status": 2,
+  "enterpriseName": "",
+  "productName": ""
+}
+
+### 详情导出
+POST {{base_url}}/record/admin/ai/check/record/export
+Content-Type: application/json
+token: {{token}}
+
+{
+  "version": "CHAIN.61.3",
+  "status": 2
+}
+
+### 更新详情记录-接受/不接受
+GET {{base_url}}/record/admin/ai/check/record/update?id=19&status=2
+Content-Type: application/json
+token: {{token}}
+
+### 更新所有详情记录
+GET {{base_url}}/record/admin/ai/check/record/update/all?version=CHAIN.54.9
+Content-Type: application/json
+token: {{token}}
+
+
+### 启动
+GET {{base_url}}/record/admin/ai/check/run?id=1
+Content-Type: application/json
+token: {{token}}
+
+### 重新发送失败消息
+GET {{base_url}}/record/admin/ai/check/reRunFail?version=CHAIN.114.1
+Content-Type: application/json
+token: {{token}}
+
+### 停止
+GET {{base_url}}/record/admin/ai/check/stop?id=4
+Content-Type: application/json
+token: {{token}}
+
+### 校验状态
+GET {{base_url}}/record/admin/ai/check/checkStatus
+Content-Type: application/json
+token: {{token}}
+
+### 巡检
+GET {{base_url}}/record/admin/ai/check/reRun?chainId=54
+Content-Type: application/json
+token: {{token}}
+
+### 导入下游
+GET {{base_url}}/record/admin/ai/check/export?id=6&isCheck=false
+Content-Type: application/json
+token: {{token}}

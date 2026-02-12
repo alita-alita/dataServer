@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.ChainNodeRefAtomNodeMapper">
+
+    <delete id="deleteByAtomId" parameterType="Long">
+        delete from chain_node_ref_atom_node
+        where atom_node_id = #{atomNodeId}
+    </delete>
+
+    <select id="selectNodeRefLabelByNodeIdsAndLabelIds" parameterType="map" resultType="cn.idicc.taotie.infrastructment.entity.icm.RecordIndustryChainNodeLabelRelationDO" >
+        select t1.`biz_id` as chain_node_id , t3.industry_label_id ,
+               t3.gmt_create,t3.gmt_modify, t3.create_by, t3.update_by from `record_industry_chain_node` t1
+            inner join `chain_node_ref_atom_node` t2 on t1.`biz_id` = t2.`node_id`
+            inner join `atom_node_ref_industry_label` t3 on t2.`atom_node_id` = t3.`atom_node_id`
+        where t3.`industry_label_id` in
+        <foreach item="item" collection="labelIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+          and t2.`node_id` in
+        <foreach item="item" collection="nodeIds" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getRelationByNodeIds" resultType="cn.idicc.taotie.infrastructment.entity.icm.RecordIndustryChainNodeLabelRelationDO">
+        select t1.industry_label_id  ,t2.`node_id` as chain_node_id  from
+        `atom_node_ref_industry_label` t1
+        inner join `chain_node_ref_atom_node` t2 on t1.`atom_node_id` = t2.`atom_node_id`
+        where t2.node_id in
+        <foreach collection="nodeIds" item="nodeId" separator="," open="(" close=")" index="">
+            #{nodeId}
+        </foreach>
+    </select>
+
+    <select id="countByNodeIdsAndLabelIds" parameterType="map" resultType="long">
+        select count(1) from
+            `record_industry_label` t1
+                inner join `atom_node_ref_industry_label` t2 on t1.`biz_id` = t2.`industry_label_id`
+                inner join `chain_node_ref_atom_node` t3 on t2.`atom_node_id` = t3.`atom_node_id`
+        <where>
+            <if test="labelIds != null">
+                t1.`biz_id` in
+                <foreach item="item" collection="labelIds" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="nodeIds != null">
+                t3.`node_id` in
+                <foreach item="item" collection="nodeIds" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

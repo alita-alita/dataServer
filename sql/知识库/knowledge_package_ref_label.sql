@@ -1,0 +1,10 @@
+CREATE TABLE knowledge_package_ref_label (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    knowledge_package_id BIGINT NOT NULL,
+    label_id BIGINT NOT NULL,
+    deleted BOOLEAN DEFAULT FALSE,
+    gmt_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    gmt_modify TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    create_by VARCHAR(50),
+    update_by VARCHAR(50)
+);

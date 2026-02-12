@@ -1,0 +1,40 @@
+package cn.idicc.taotie.infrastructment.entity.xiaoai;
+
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.Date;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@TableName("enterprise_tax_abnormal")
+public class EnterpriseTaxAbnormalDO extends DataSyncBaseDO {
+	/**
+	 * 企业名称
+	 */
+	private String enterpriseName;
+
+	/**
+	 * 企业社会统一信用代码
+	 */
+	private String enterpriseUniCode;
+
+	/**
+	 * 列入日期
+	 */
+	private Date listDate;
+
+	/**
+	 * 作出决定机关
+	 */
+	private String decisionMakingAuthority;
+
+	/**
+	 * 数据来源
+	 */
+	private String dataSource;
+
+
+}

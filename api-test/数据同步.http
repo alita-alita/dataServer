@@ -1,0 +1,15 @@
+### 企业指标
+GET https://taotie.idicc.cn/sync/admin/update/development/index
+Content-Type: application/json
+token: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxODg1NzE0MzEwMyMjLSMjLSMjNDcuOTYuMTM0LjEzNiMjM2ZwZDlqdnY2dyMjMTIiLCJpYXQiOjE3NTM4Mzk5MzcsImV4cCI6MTc1NDQ0NDczN30.XA582BFzxaz_Y8Y8JZ97YsRswM_8cgNVWB7wbHZ8g25yWMJQ2xj7qeQEZn-4pmKj8ZmKlC5whcf9HrRcZRXBIg
+
+
+### 企业籍贯
+GET {{base_url}}/sync/admin/update/ancestor
+Content-Type: application/json
+token: {{token}}
+
+### 企业学校
+GET {{base_url}}/sync/admin/update/academia
+Content-Type: application/json
+token: {{token}}

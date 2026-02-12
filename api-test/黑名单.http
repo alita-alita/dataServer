@@ -1,0 +1,18 @@
+### 黑名单列表
+POST {{base_url}}/record/admin/blacklistKeywords/selectAll
+Content-Type: application/json
+token: {{token}}
+
+{
+  "version": ""
+}
+
+### 移除黑名单
+POST {{base_url}}/record/admin/blacklistKeywords/deleteRecordBlacklistKeywordsByName
+Content-Type: application/json
+token: {{token}}
+
+{
+  "blacklistKeywordsName": "",
+  "blacklistIndustrialChain": 54
+}

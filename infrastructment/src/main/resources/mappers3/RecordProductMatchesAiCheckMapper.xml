@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordProductMatchesAiCheckMapper">
+    <insert id="insertBatch">
+        insert into record_product_matches_ai_check(
+                                                    chain_id,
+                                                    enterprise_id, enterprise_name, enterprise_uni_code,
+                                                    product_id, product_name, product_url, product_description, product_purpose,
+                                                    label_id, label_name,
+                                                    node_id,node_name,
+                                                    matched_score, match_reason)
+        values
+        <foreach collection='list' item='item' separator=','>
+        (
+             #{item.chainId},
+             #{item.enterpriseId},
+             #{item.enterpriseName},
+             #{item.enterpriseUniCode},
+            #{item.productId},
+            #{item.productName},
+            #{item.productUrl},
+            #{item.productDescription},
+            #{item.productPurpose},
+            #{item.labelId},
+             #{item.labelName},
+            #{item.nodeId},
+            #{item.nodeName},
+             #{item.matchedScore},
+             #{item.matchReason}
+        )
+        </foreach>
+    </insert>
+
+    <select id="pageCount" parameterType="map" resultType="long">
+        select
+            count(1) as total
+        from record_product_matches_ai_check rpmac
+        inner join `atom_node_ref_industry_label` t1 on rpmac.label_id = t1.`industry_label_id` and t1.`deleted` = 0
+        inner join `chain_node_ref_atom_node` t2 on t1.`atom_node_id` = t2.`atom_node_id`  and t2.`deleted` = 0
+        inner join `record_industry_label` t3 on t1.`industry_label_id` = t3.`biz_id` and t3.`deleted` = 0
+        inner join record_industry_chain_node ricn on ricn.biz_id = rpmac.node_id and ricn.chain_id = #{chainId}
+        and ricn.`biz_id` = t2.`node_id` and ricn.`deleted` = 0
+        where rpmac.chain_id = #{chainId}
+        and rpmac.status = #{status}
+        <if test="nodeId != null">
+            and rpmac.node_id = #{nodeId}
+        </if>
+        <if test="labelId != null">
+            and rpmac.label_id = #{labelId}
+        </if>
+        <if test="enterprise_name != null and enterprise_name != ''">
+            and rpmac.enterprise_name like concat('%',#{enterprise_name},'%')
+        </if>
+        <if test="product_name != null and product_name != ''">
+            and rpmac.product_name like concat('%',#{product_name},'%')
+        </if>
+    </select>
+
+    <select id="pageList"
+            parameterType = "map"
+            resultType="cn.idicc.taotie.infrastructment.response.icm.RecordProductMatchesAiCheckDTO">
+        select rpmac.*,t3.label_desc,ricn.node_desc
+        from record_product_matches_ai_check rpmac
+        inner join `atom_node_ref_industry_label` t1 on rpmac.label_id = t1.`industry_label_id` and t1.`deleted` = 0
+        inner join `chain_node_ref_atom_node` t2 on t1.`atom_node_id` = t2.`atom_node_id`  and t2.`deleted` = 0
+        inner join `record_industry_label` t3 on t1.`industry_label_id` = t3.`biz_id` and t3.`deleted` = 0
+        inner join record_industry_chain_node ricn on ricn.biz_id = rpmac.node_id and ricn.chain_id = #{chainId}
+            and ricn.`biz_id` = t2.`node_id` and ricn.`deleted` = 0
+        where rpmac.chain_id = #{chainId}
+        and rpmac.status = #{status}
+        <if test="nodeId != null">
+            and rpmac.node_id = #{nodeId}
+        </if>
+        <if test="labelId != null">
+            and rpmac.label_id = #{labelId}
+        </if>
+        <if test="enterprise_name != null and enterprise_name != ''">
+            and rpmac.enterprise_name like concat('%',#{enterprise_name},'%')
+        </if>
+        <if test="product_name != null and product_name != ''">
+            and rpmac.product_name like concat('%',#{product_name},'%')
+        </if>
+        limit #{start},#{size}
+    </select>
+
+
+    <delete id="deleteByChainIdAndProductId" parameterType="map">
+        delete from record_product_matches_ai_check
+        where chain_id in
+        <foreach collection="chainIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        and product_id in
+        <foreach collection="productIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+
+    </delete>
+
+</mapper>

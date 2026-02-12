@@ -1,0 +1,85 @@
+### 刷新指定版本
+GET {{base_url}}/record/admin/product/dissociated/refresh?version=CHAIN.104.2
+Content-Type: application/json
+token: {{token}}
+
+### 分页查询
+POST {{base_url}}/record/admin/product/dissociated/pageList
+Content-Type: application/json
+token: {{token}}
+
+{
+  "version": "CHAIN.54.9",
+  "productName": "锅",
+  "enterpriseName": "公司",
+  "minMatchedScore": 0.60,
+  "status": 1,
+  "nodeId": 1689,
+  "chainId": 54
+}
+
+### 忽略
+POST {{base_url}}/record/admin/product/dissociated/ignore
+Content-Type: application/json
+token: {{token}}
+
+{
+  "ids": [243,244,245]
+}
+
+### 取消忽略
+POST {{base_url}}/record/admin/product/dissociated/notIgnore
+Content-Type: application/json
+token: {{token}}
+
+{
+  "ids": [243,244,245]
+}
+
+### 人工挂载
+POST {{base_url}}/record/admin/product/dissociated/manualMount
+Content-Type: application/json
+token: {{token}}
+
+{
+  "id": 243,
+  "version": "CHAIN.54.9",
+  "nodeId": 1692,
+  "labelId": 5741
+}
+
+### 修改
+POST {{base_url}}/record/admin/product/dissociated/updateProductInfo
+Content-Type: application/json
+token: {{token}}
+
+{
+  "id": 243,
+  "productName": "挠性铜箔(FCF)",
+  "productDescription": "",
+  "productUrl": "",
+  "productPurpose": ""
+}
+
+### 模板下载
+GET {{base_url}}/record/admin/product/dissociated/templateDownload
+Content-Type: application/json
+token: {{token}}
+
+### 导入
+POST {{base_url}}/record/admin/product/dissociated/import
+Cache-Control: no-cache
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+token: {{token}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="dissocaiated.xlsx"
+Content-Type: multipart/form-data
+
+< C:\Users\admin\Desktop\dissocaiated.xlsx
+--WebAppBoundary
+Content-Disposition: form-data; name="version"
+Content-Type: multipart/form-data
+
+CHAIN.54.9
+--WebAppBoundary--

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.xiaoai.EnterpriseAcademiaMapper">
+
+    <insert id="insertBatch"
+            parameterType="cn.idicc.taotie.infrastructment.entity.xiaoai.EnterpriseAcademiaDO">
+        insert into
+            enterprise_academia(uni_code, academic_md5, academic_code, related_type, related_uni_code, related_talent, related_talent_md5,related_talent_occupation, enterprise_code, enterprise_province, enterprise_city, enterprise_area, enterprise_chain_ids)
+        values
+        <foreach collection="dos" separator="," open="" close="" item="do">
+            (#{do.uniCode},#{do.academicMd5},#{do.academicCode},#{do.relatedType},#{do.relatedUniCode},#{do.relatedTalent},#{do.relatedTalentMd5},#{do.relatedTalentOccupation},#{do.enterpriseCode},#{do.enterpriseProvince},#{do.enterpriseCity},#{do.enterpriseArea},#{do.enterpriseChainIds})
+        </foreach>
+    </insert>
+    <delete id="physicsDeleteAll">
+        delete from enterprise_academia
+    </delete>
+    <delete id="physicsDeleteByIds">
+        delete from enterprise_academia
+        where id in
+        <foreach collection="ids" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+    </delete>
+    <select id="countByCodeAndChainId" resultType="java.lang.Integer">
+        select count(distinct(ea.uni_code))
+        from enterprise_academia ea
+        where ea.academic_code like concat(#{code},'%')
+        <if test="chain_id != null and chain_id != ''">
+            and ea.enterprise_chain_ids like concat('%',#{chain_id},'%')
+        </if>
+    </select>
+    <select id="pageByAll" resultType="cn.idicc.taotie.infrastructment.entity.xiaoai.EnterpriseAcademiaDO">
+        select ea.uni_code,
+            any_value(ea.academic_md5) as academic_md5,
+            any_value(ea.academic_code) as academic_code,
+            any_value(ea.related_talent) as related_talent,
+            any_value(ea.related_talent_md5) as related_talent_md5,
+            any_value(ea.related_talent_occupation) as related_talent_occupation
+        from enterprise_academia ea
+        where ea.academic_md5 in
+        <foreach collection="academia_md5s" separator="," open="(" close=")" item="md5">
+            #{md5}
+        </foreach>
+        <if test="eProvince != null and eProvince != ''">
+            and ea.enterprise_province = #{eProvince}
+        </if>
+        <if test="eCity != null and eCity != ''">
+            and ea.enterprise_city = #{eCity}
+        </if>
+        <if test="eArea != null and eArea != ''">
+            and ea.enterprise_area = #{eArea}
+        </if>
+        <if test="chain_id != null and chain_id != ''">
+            and ea.enterprise_chain_ids like concat('%',#{chain_id},'%')
+        </if>
+        group by ea.uni_code
+        order by ea.uni_code
+    </select>
+    <select id="countByAll" resultType="java.lang.Integer">
+        select count(distinct (ea.uni_code))
+        from enterprise_academia ea
+        where ea.academic_md5 in
+        <foreach collection="academia_md5s" separator="," open="(" close=")" item="md5">
+            #{md5}
+        </foreach>
+        <if test="eProvince != null and eProvince != ''">
+            and ea.enterprise_province = #{eProvince}
+        </if>
+        <if test="eCity != null and eCity != ''">
+            and ea.enterprise_city = #{eCity}
+        </if>
+        <if test="eArea != null and eArea != ''">
+            and ea.enterprise_area = #{eArea}
+        </if>
+        <if test="chain_id != null and chain_id != ''">
+            and ea.enterprise_chain_ids like concat('%',#{chain_id},'%')
+        </if>
+    </select>
+    <select id="pageByCode" resultType="cn.idicc.taotie.infrastructment.entity.xiaoai.EnterpriseAcademiaDO">
+        select ea.uni_code,
+        any_value(ea.academic_md5) as academic_md5,
+        any_value(ea.academic_code) as academic_code,
+        any_value(ea.related_talent) as related_talent,
+        any_value(ea.related_talent_occupation) as related_talent_occupation
+        from enterprise_academia ea
+        where ea.academic_code like concat(#{code},'%')
+        <if test="province != null and province != ''">
+            and not (ea.enterprise_province =  #{province}
+            <if test="city != null and city != ''">
+                and ea.enterprise_city =  #{city}
+            </if>
+            <if test="area != null and area != ''">
+                and ea.enterprise_area =  #{area}
+            </if>)
+        </if>
+        <if test="eProvince != null and eProvince != ''">
+            and ea.enterprise_province = #{eProvince}
+        </if>
+        <if test="eCity != null and eCity != ''">
+            and ea.enterprise_city = #{eCity}
+        </if>
+        <if test="eArea != null and eArea != ''">
+            and ea.enterprise_area = #{eArea}
+        </if>
+        <if test="chain_id != null and chain_id != ''">
+            and ea.enterprise_chain_ids like concat('%',#{chain_id},'%')
+        </if>
+        group by ea.uni_code
+    </select>
+    <select id="selectByPage" resultType="cn.idicc.taotie.infrastructment.response.xiaoai.EnterpriseCodesDTO">
+        select uni_code,group_concat(academic_code separator '/') as codes,group_concat(academic_md5 separator '/') as others
+        from enterprise_academia
+        group by uni_code
+    </select>
+</mapper>

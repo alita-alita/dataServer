@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.dw.DwdIndustryLabelMapper">
+
+    <insert id="insertOnDuplicate">
+        INSERT INTO dwd_industry_label
+        (id,
+        label_name, label_type,
+        industry_chain_id, industry_chain_name,
+        deleted,gmt_create,gmt_modify,create_by, update_by, data_source)
+        VALUES
+        <foreach collection ="dos" item="do" separator =",">
+            (#{do.id},
+            #{do.labelName}, #{do.labelType},
+            #{do.industryChainId}, #{do.industryChainName},
+            #{do.deleted}, #{do.gmtCreate}, #{do.gmtModify},#{do.createBy}, #{do.updateBy}, #{do.dataSource})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            label_name = values(label_name),
+            label_type = values(label_type),
+            industry_chain_id = values(industry_chain_id),
+            industry_chain_name = values(industry_chain_name),
+            deleted = VALUES(deleted),
+            gmt_create = VALUES(gmt_create),
+            gmt_modify = VALUES(gmt_modify),
+            create_by = VALUES(create_by),
+            update_by = VALUES(update_by)
+    </insert>
+</mapper>

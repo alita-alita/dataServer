@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordIndustryChainMapper">
+    <delete id="physicsBatchDeleteByChainId">
+        delete from record_industry_chain ric
+        where ric.biz_id = #{chain_id}
+    </delete>
+
+    <select id="getMaxBizId" resultType="java.lang.Long">
+        select max(ric.biz_id)
+        from record_industry_chain ric
+    </select>
+    <select id="chainPageSearch" resultType="cn.idicc.taotie.infrastructment.response.icm.RecordIndustryChainDTO">
+        select
+            ric.biz_id as id,
+            ric.chain_code,
+            ric.chain_name,
+            ric.relevance_organize_number,
+            ric.relevance_enterprise_number,
+            ric.notes,
+            ric.former_name,
+            ric.gmt_modify,
+            ric.gmt_create,
+            ric.icon,
+            ric.state,
+            ric.lib_file_id
+        from record_industry_chain ric
+        <where>
+            <if test= "notes != null and notes != ''">
+                and ric.notes like concat('%',#{notes},'%')
+            </if>
+            <if test= "chain_name != null and chain_name != ''">
+                and ric.chain_name like concat('%',#{chain_name},'%')
+            </if>
+            <if test="chain_ids != null and chain_ids.size() > 0">
+                and ric.biz_id in
+                <foreach collection="chain_ids" separator="," open="(" close=")" item="chain_id">
+                    #{chain_id}
+                </foreach>
+            </if>
+        </where>
+
+        order by ric.id desc
+    </select>
+</mapper>

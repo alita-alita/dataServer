@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordVersionMapper">
+    <delete id="deleteUseless">
+        delete from record_version
+        where version not in (
+            select version from record_industry_chain
+        )
+    </delete>
+
+    <select id="getMaxSortByUk" resultType="java.lang.Integer">
+        select max(rv.sort)
+        from record_version rv
+        where rv.business_uk = #{business_uk} and rv.business_relation_key = #{business_relation_key}
+    </select>
+    <select id="produceChainRecords" resultType="cn.idicc.taotie.infrastructment.response.icm.RecordVersionDTO">
+        select rv.version,
+               rv.state,
+               rv.business_uk,
+               rv.business_relation_key,
+               rv.gmt_create as startProducingDate
+        from record_version rv
+        where
+        <if test="chainId != null and chainId != ''">
+            rv.business_relation_key = #{chainId}
+        </if>
+    </select>
+    <select id="onlineChainRecords" resultType="cn.idicc.taotie.infrastructment.response.icm.RecordVersionDTO">
+        select
+               rv.state,
+               rv.business_uk,
+               rv.business_relation_key,
+               max(rvcf.gmt_create) as startOnlineDate
+        from record_version rv
+        inner join record_version_change_flow rvcf on rvcf.version = rv.version and rvcf.to_state = 5
+        where rv.state in (5,6,7,8)
+        <if test="version != null and version != ''">
+            and rv.version like concat('%',#{version},'%')
+        </if>
+        group by rv.version
+    </select>
+</mapper>

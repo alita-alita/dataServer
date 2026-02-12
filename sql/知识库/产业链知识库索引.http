@@ -1,0 +1,70 @@
+PUT /dev_knowledge_industry_chain_node
+
+{
+  "settings": {
+    "number_of_shards": "1",
+    "number_of_replicas": "1",
+    "analysis": {
+        "analyzer": {
+          "one_analyzer": {
+            "tokenizer": "one_tokenizer"
+          }
+        },
+        "tokenizer": {
+          "one_tokenizer": {
+            "token_chars": [
+                "letter",
+               "digit"
+            ],
+            "min_gram": "1",
+            "type": "ngram",
+            "max_gram": "1"
+          }
+        }
+      }
+  },
+  "mappings": {
+    "dynamic": "false",
+    "properties": {
+      "id": {
+        "type": "long"
+      },
+      "nodeName": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        },
+        "analyzer": "one_analyzer"
+      },
+      "nodeConcept": {
+        "type": "keyword"
+      },
+      "productNames": {
+        "type": "keyword"
+      },
+      "nodeLevel": {
+        "type": "long"
+      },
+      "nodeParent": {
+        "type": "long"
+      },
+      "chainId": {
+        "type": "long"
+      },
+      "chainName": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        },
+        "analyzer": "one_analyzer"
+      },
+      "chainConcept": {
+        "type": "keyword"
+      }
+    }
+  }
+}

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 1.在mybats的开发中namespace有特殊的意思，一定要是对应接口的全限定名通过namespace可以简历mapper.xml和接口之间的关系(名字不重要，位置不重要)-->
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.spider.HoldMapper">
+    <resultMap id="holdMap" type="cn.idicc.taotie.infrastructment.entity.spider.Hold">
+        <result property="holdId" column="hold_id"/>
+        <result property="holderName" column="holder_name"/>
+        <result property="holderUniCode" column="holder_uniCode"/>
+        <result property="holderPlatform" column="holder_platform"/>
+        <result property="holderTaskCode" column="holder_taskCode"/>
+        <result property="holderState" column="holder_state"/>
+        <result property="holderTime" column="holder_time"/>
+        <result property="holderCycle" column="holder_cycle"/>
+        <result property="holderNextTime" column="holder_nextTime"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <resultMap id="holdKafkaMap" type="cn.idicc.taotie.infrastructment.entity.spider.HoldKafka">
+        <result property="uniKey" column="hold_id"/>
+        <result property="taskCode" column="holder_taskCode"/>
+        <result property="platform" column="holder_platform"/>
+        <result property="enterpriseName" column="holder_name"/>
+        <result property="uniCode" column="holder_uniCode"/>
+    </resultMap>
+
+    <sql id="holdSql">
+        SELECT hold_id , holder_name , holder_uniCode , holder_platform,
+            holder_taskCode, holder_state,  holder_time, holder_cycle, holder_nextTime,deleted
+        FROM hold
+    </sql>
+
+    <sql id="holdKafkaSql">
+        SELECT hold_id ,holder_taskCode, holder_platform, holder_name , holder_uniCode , holder_cycle
+        FROM hold
+    </sql>
+
+    <select id="listHold" resultMap="holdMap">
+        <include refid="holdSql"/>
+        <where>
+            <if test="holderName!=null and holderName!=''">
+                AND INSTR(holder_name, #{holderName})
+            </if>
+            <if test="holderState!=null">
+                AND holder_state = #{holderState}
+            </if>
+            AND deleted=0
+        </where>
+        ORDER BY  holder_time DESC
+    </select>
+
+    <select id="manualGather" resultMap="holdKafkaMap">
+        <include refid="holdKafkaSql"/>
+        WHERE hold_id  IN
+        <foreach collection="holdIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        AND deleted = 0
+    </select>
+
+    <select id="findByCollectTime" resultMap="holdMap">
+        <include refid="holdKafkaSql"/>
+        WHERE #{holderNextTime} >=  holder_nextTime
+        AND deleted=0
+    </select>
+
+    <insert id="addHold">
+        INSERT INTO `taotie`.`hold` (
+        `holder_name`, `holder_uniCode`, `holder_platform`,`holder_taskCode`,`holder_time`, `holder_cycle`, `holder_nextTime`)
+        VALUES
+        (
+        <if test="holderName!= null and  holderName!= ''">
+            #{holderName},
+        </if>
+        <if test="holderName == null or holderName ==''">
+            NULL,
+        </if>
+        <if test="holderUniCode!= null and  holderUniCode!= ''">
+            #{holderUniCode},
+        </if>
+        <if test="holderUniCode == null or holderUniCode ==''">
+            NULL,
+        </if>
+        <if test="holderPlatform!= null and  holderPlatform!= ''">
+            #{holderPlatform},
+        </if>
+        <if test="holderPlatform == null or holderPlatform ==''">
+            NULL,
+        </if>
+        <if test="holderTaskCode!= null and  holderTaskCode!= ''">
+            #{holderTaskCode},
+        </if>
+        <if test="holderTaskCode == null or holderTaskCode ==''">
+            NULL,
+        </if>
+        NOW(),
+        <if test=" holderCycle!= null">
+            #{holderCycle},
+        </if>
+        <if test=" holderCycle == null">
+            NULL,
+        </if>
+        DATE_ADD(NOW(), INTERVAL #{holderCycle} DAY)
+        )
+    </insert>
+
+
+    <insert id="addHoldBatch">
+        INSERT INTO `taotie`.`hold` (
+        `holder_name`, `holder_uniCode`, `holder_platform`,`holder_taskCode`, `holder_time`, `holder_cycle`, `holder_nextTime`
+        )
+        VALUES
+        <foreach item="item" index="index" collection="holdDataList" separator=",">
+            (
+            <if test="item.holderName != null and item.holderName != ''">
+                #{item.holderName},
+            </if>
+            <if test="item.holderName == null or item.holderName == ''">
+                NULL,
+            </if>
+            <if test="item.holderUniCode != null and item.holderUniCode != ''">
+                #{item.holderUniCode},
+            </if>
+            <if test="item.holderUniCode == null or item.holderUniCode == ''">
+                NULL,
+            </if>
+            <if test="item.holderPlatform != null and item.holderPlatform != ''">
+                #{item.holderPlatform},
+            </if>
+            <if test="item.holderPlatform == null or item.holderPlatform == ''">
+                NULL,
+            </if>
+            <if test="item.holderTaskCode != null and item.holderTaskCode != ''">
+                #{item.holderTaskCode},
+            </if>
+            <if test="item.holderTaskCode == null or item.holderTaskCode == ''">
+                NULL,
+            </if>
+            NOW(),
+            <if test="item.holderCycle != null">
+                #{item.holderCycle},
+            </if>
+            <if test="item.holderCycle == null">
+                NULL,
+            </if>
+             DATE_ADD(NOW(), INTERVAL #{item.holderCycle} DAY)
+            )
+        </foreach>
+    </insert>
+
+
+
+    <update id="updateHoldTime">
+        UPDATE `taotie`.`hold` SET
+                               `holder_time` = NOW() ,
+                               `holder_nextTime` = DATE_ADD(NOW(),INTERVAL holder_cycle DAY),
+                               `holder_state`= 1
+        WHERE hold_id = #{HoldId}
+    </update>
+
+    <update id="delLogicHold">
+        UPDATE `taotie`.`hold` SET deleted = 1  WHERE hold_id = #{holdId}
+    </update>
+
+
+
+
+</mapper>

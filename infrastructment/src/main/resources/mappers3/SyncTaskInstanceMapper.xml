@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.SyncTaskInstanceMapper">
+
+    <select id="page" resultType="cn.idicc.taotie.infrastructment.response.icm.task.TaskInstanceDTO">
+        select sti.*,st.name as task_name,sti.gmt_create
+        from sync_task_instance sti
+        inner join sync_task st on st.id = sti.task_id and st.deleted = 0
+        where sti.deleted = 0
+        <if test="task_id != null">
+            and sti.task_id = #{task_id}
+        </if>
+        order by sti.gmt_modify desc
+    </select>
+</mapper>

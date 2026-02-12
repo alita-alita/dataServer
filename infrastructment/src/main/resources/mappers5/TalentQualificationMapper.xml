@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.xiaoai.TalentQualificationMapper">
+
+    <select id="getBytalentMd5" resultType="java.lang.String">
+        select distinct(tq.talent_md5)
+        from talent_qualification tq
+        inner join talent_industry_chain_relation ticr on ticr.talent_md5 = tq.talent_md5
+        where tq.qualification_type = 0
+        and tq.qualification_name in
+        <foreach collection="names" separator="," open="(" close=")" item="name">
+            #{name}
+        </foreach>
+        and tq.talent_md5 in
+        <foreach collection="talentMd5s" separator="," open="(" close=")" item="talentMd5">
+            #{talentMd5}
+        </foreach>
+    </select>
+</mapper>

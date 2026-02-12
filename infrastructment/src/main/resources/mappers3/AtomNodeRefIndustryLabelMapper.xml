@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.AtomNodeRefIndustryLabelMapper">
+
+    <select id="selectOne" parameterType="map" resultType="cn.idicc.taotie.infrastructment.entity.icm.AtomNodeRefIndustryLabelDO">
+        select * from atom_node_ref_industry_label
+        where atom_node_id = #{atomNodeId} and industry_label_id = #{industryLabelId}
+    </select>
+
+    <delete id="deleteByRefId" parameterType="java.lang.Long">
+        delete from atom_node_ref_industry_label where id = #{id}
+    </delete>
+
+    <delete id="deleteByAtomId" parameterType="java.lang.Long">
+        delete from atom_node_ref_industry_label where atom_node_id = #{atomNodeId}
+    </delete>
+</mapper>

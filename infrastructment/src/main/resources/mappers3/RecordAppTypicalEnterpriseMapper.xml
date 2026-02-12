@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordAppTypicalEnterpriseMapper">
+
+    <delete id="physicDelete" parameterType="java.lang.Long">
+        delete from record_app_typical_enterprise
+               where id = #{id}
+    </delete>
+
+    <select id="queryByChainId" resultType="cn.idicc.taotie.infrastructment.entity.icm.RecordAppTypicalEnterpriseDO">
+        SELECT
+        t5.*,
+        t3.biz_id as industryNodeId,
+        t3.node_name as industryNodeName
+        FROM
+        industry_chain_atom_node t1
+        INNER JOIN chain_node_ref_atom_node t2 ON t1.id = t2.atom_node_id
+        INNER JOIN record_industry_chain_node t3 ON t2.node_id = t3.biz_id
+        INNER JOIN atom_node_ref_industry_label t4 ON t4.atom_node_id = t1.id
+        INNER JOIN record_app_typical_enterprise t5 ON t5.industry_label_id = t4.industry_label_id
+        WHERE
+        t1.deleted = 0
+        AND t2.deleted = 0
+        AND t3.deleted = 0
+        AND t4.deleted = 0
+        AND t5.deleted = 0
+        AND t3.chain_id = #{chainId}
+    </select>
+</mapper>

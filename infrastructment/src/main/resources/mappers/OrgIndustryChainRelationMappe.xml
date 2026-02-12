@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.data.OrgIndustryChainRelationMapper">
+    <select id="listByOrgId" resultType="cn.idicc.taotie.infrastructment.response.data.OrgIndustryChainRelationDTO">
+        SELECT a.id,
+        a.industry_chain_id,
+        a.status,
+        b.gmt_modify as gmtModify,
+        b.chain_name as chainName,
+        b.icon
+        from org_industry_chain_relation a
+        LEFT JOIN industry_chain b on a.industry_chain_id = b.id
+        where a.deleted = 0
+        AND b.deleted = FALSE
+        and a.organize_id = #{queryDTO.orgId}
+        <if test="queryDTO.chainIds != null and queryDTO.chainIds.size>0">
+            and a.industry_chain_id in
+            <foreach collection="queryDTO.chainIds" item="chainId" separator="," close=")" open="(">
+                #{chainId}
+            </foreach>
+        </if>
+        <if test="queryDTO.chainName != null and queryDTO.chainName !=''">
+            and (b.chain_name like CONCAT('%',#{queryDTO.chainName},'%') or b.chain_name_pinyin like
+            CONCAT('%',#{queryDTO.chainName},'%'))
+        </if>
+        <if test="queryDTO.status != null and queryDTO.status == true">
+            and a.status = 1
+        </if>
+        order by a.status DESC,a.gmt_create ASC
+    </select>
+</mapper>

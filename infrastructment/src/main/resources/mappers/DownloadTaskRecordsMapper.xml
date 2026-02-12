@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 1.在mybats的开发中namespace有特殊的意思，一定要是对应接口的全限定名通过namespace可以简历mapper.xml和接口之间的关系(名字不重要，位置不重要)-->
+
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.spider.DownloadTaskRecordsMapper">
+    <resultMap id="DTRecordsMap" type="cn.idicc.taotie.infrastructment.entity.spider.DownloadTaskRecords">
+        <result column="download_task_records_id" property="downloadTaskRecordsId"/>
+        <result column="download_task_records_name" property="downloadTaskRecordsName"/>
+        <result column="submission_time" property="submissionTime"/>
+        <result column="completion_time" property="completionTime"/>
+        <result column="download_task_records_states" property="downloadTaskRecordsStates"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <insert id="addDownloadTaskRecords">
+        INSERT INTO `taotie`.`download_task_records`
+         (`download_task_records_name`, `submission_time`, `completion_time`, `download_task_records_states` )
+        VALUES
+         ( <if test="downloadTaskRecordsName!=null and downloadTaskRecordsName!= ''" >
+           #{downloadTaskRecordsName},
+           </if>
+           <if test="downloadTaskRecordsName==null or downloadTaskRecordsName== ''" >
+           NULL,
+           </if>
+           NOW(),
+          <if test="completionTime!=null and completionTime!= ''" >
+           #{completionTime},
+           </if>
+           <if test="completionTime==null or completionTime== ''" >
+           NULL,
+           </if>
+           <if test="downloadTaskRecordsStates!=null and downloadTaskRecordsStates!= ''" >
+           #{downloadTaskRecordsStates},
+           </if>
+            <if test="downloadTaskRecordsStates==null or downloadTaskRecordsStates== ''" >
+           NULL,
+           </if>);
+    </insert>
+
+    <!--逻辑删除-->
+    <update id="delLogicDownloadTaskRecords">
+        UPDATE download_task_records SET deleted = 1 WHERE download_task_records_id = #{downloadTaskRecordsId}
+    </update>
+
+
+    <select id="listDownloadTaskRecords" resultMap="DTRecordsMap">
+        SELECT download_task_records_id,
+               download_task_records_name,
+               submission_time,
+               completion_time,
+               download_task_records_states
+        FROM download_task_records
+        where deleted = 0
+    </select>
+
+
+</mapper>

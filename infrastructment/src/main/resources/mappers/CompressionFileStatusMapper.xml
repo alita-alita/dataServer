@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 1.在mybats的开发中namespace有特殊的意思，一定要是对应接口的全限定名通过namespace可以简历mapper.xml和接口之间的关系(名字不重要，位置不重要)-->
+
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.spider.CompressionFileStatusMapper">
+    <resultMap id="compressionFileStatusMap" type="cn.idicc.taotie.infrastructment.entity.spider.CompressionFileStatus">
+        <result column="compression_status_id" property="compressionStatusId"/>
+        <result column="package_status" property="packageStatus"/>
+        <result column="file_status" property="fileStatus"/>
+        <result column="data_market" property="dataMarket"/>
+        <result column="processing_time" property="processingTime"/>
+        <result column="completion_time" property="completionTime"/>
+        <result column="file_status_id" property="fileStatusId"/>
+        <result column="file_compression_id" property="fileCompressionId"/>
+        <result column="file_name" property="fileName"/>
+        <result column="error_info" property="errorInfo"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+    <resultMap id="compressionStatusMap" type="cn.idicc.taotie.infrastructment.entity.spider.CompressionStatus">
+        <result column="compression_status_id" property="compressionStatusId"/>
+        <result column="package_status" property="packageStatus"/>
+        <result column="file_status" property="fileStatus"/>
+        <result column="data_market" property="dataMarket"/>
+        <result column="processing_time" property="processingTime"/>
+        <result column="completion_time" property="completionTime"/>
+        <result column="deleted" property="deleted"/>
+    </resultMap>
+
+    <sql id="compressionSQL">
+    SELECT    compression_status_id,
+              package_status,
+              file_status,
+              data_market,
+              processing_time,
+              completion_time,
+              deleted
+    FROM compression_status
+    </sql>
+
+    <sql id="compressionFileSQL">
+        SELECT compression_status_id,
+               package_status,
+               file_status,
+               data_market,
+               processing_time,
+               completion_time,
+               file_status_id,
+               file_compression_id,
+               file_name,
+               error_info
+        FROM compression_status LEFT JOIN file_status ON compression_status.compression_status_id=file_status.file_compression_id
+    </sql>
+    <update id="updLogicCompressionStatus">
+        UPDATE compression_status
+        SET deleted = 1
+        WHERE compression_status_id = #{compressionStatusId}
+    </update>
+
+    <select id="listCompressionFileStatus" resultMap="compressionFileStatusMap">
+        <include refid="compressionFileSQL"/>
+        <where>
+            <if test="fileCompressionId != null">
+                AND file_compression_id = #{fileCompressionId}
+            </if>
+            AND deleted = 0
+        </where>
+        </select>
+
+
+    <select id="listCompressionStatus" resultMap="compressionStatusMap" >
+        <include refid="compressionSQL"/>
+        <where>
+            <if test="packageStatus != null ">
+                AND package_status = #{packageStatus} ,
+            </if>
+            <if test="fileStatus != null ">
+                AND file_status = #{fileStatus} ,
+            </if>
+                AND data_market = #{dataMarket} ,
+                AND delete = 0
+        </where>
+    </select>
+
+    <select id="listFileStatus" resultType="cn.idicc.taotie.infrastructment.entity.spider.FileStatus">
+        SELECT error_info FROM `taotie`.`file_status`
+                          where file_status_id = #{fileStatusId}
+    </select>
+
+    <insert id="addCompressionStatus">
+        INSERT INTO `taotie`.`compression_status`
+            (`package_status`, `file_status`, `data_market`, `processing_time`, `completion_time`)
+        VALUES
+            ( <choose>
+        <when test="packageStatus != null">
+            #{packageStatus},
+        </when>
+        <otherwise>
+            NULL,
+        </otherwise>
+    </choose>
+        <choose>
+            <when test="fileStatus != null">
+                #{fileStatus},
+            </when>
+            <otherwise>
+                NULL,
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="dataMarket != null and dataMarket != ''">
+                #{dataMarket},
+            </when>
+            <otherwise>
+                NULL,
+            </otherwise>
+        </choose>
+        NOW(),
+        <choose>
+            <when test="completionTime != null and completionTime != ''">
+                #{completionTime}
+            </when>
+            <otherwise>
+                NULL
+            </otherwise>
+        </choose>
+        )
+           </insert>
+
+
+    <insert id="addFileStatus">
+        INSERT INTO `taotie`.`file_status`
+            (`file_compression_id`, `file_name`, `error_info`)
+        VALUES
+            (<if test="fileCompressionId != null">
+             #{fileCompressionId},
+             </if>
+             <if test="fileCompressionId == null">
+             NULL,
+             </if>
+             <if test="fileName != null and fileName != ''">
+             #{fileName},
+             </if>
+             <if test="fileName == null or fileName == ''">
+             NULL,
+             </if>
+             <if test="errorInfo != null and errorInfo != ''">
+             #{errorInfo}
+             </if>
+             <if test="errorInfo == null or errorInfo == ''">
+             NULL
+             </if>
+             );
+
+    </insert>
+
+
+
+
+
+
+</mapper>

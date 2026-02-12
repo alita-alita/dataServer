@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.xiaoai.EnterpriseProductMapper">
+
+
+    <select id="getProductByChainIdOrUniCode" resultType="cn.idicc.taotie.infrastructment.po.data.EnterpriseProductPO">
+        select
+        CONCAT(picr.industry_chain_id, '-', picr.industry_chain_node_id, '-', ep.product_md5) as id,
+        ep.product_md5,
+        ep.product_name,
+        ep.product_code,
+        ep.product_model,
+        ep.publish_date,
+        ep.product_advantage,
+        ep.product_planning,
+        ep.enterprise_uni_code,
+        ep.news_url,
+        ep.news_md5,
+        ep.deleted,
+        ep.create_by,
+        ep.update_by,
+        UNIX_TIMESTAMP(ep.gmt_create) * 1000 as gmt_create,
+        UNIX_TIMESTAMP(ep.gmt_modify) * 1000 as gmt_modify,
+        picr.industry_chain_id, picr.industry_chain_node_id
+        from enterprise_product ep
+        inner join product_industry_chain_relation picr on picr.product_md5 = ep.product_md5
+        where 1 = 1
+        <if test="chainId != null">
+            and picr.industry_chain_id = #{chainId}
+        </if>
+        <if test="enterpriseUniCode != null">
+            and ep.enterprise_uni_code = #{enterpriseUniCode}
+        </if>
+    </select>
+
+    <select id="selectProductNameByUniCode" resultType="cn.idicc.taotie.infrastructment.entity.xiaoai.EnterpriseProductDO">
+        select ep.enterprise_uni_code, ep.product_name
+        from enterprise_product ep
+        where ep.enterprise_uni_code in
+        <foreach collection="uniCodes" item="uniCode" open="(" close=")" separator=",">
+            #{uniCode}
+        </foreach>
+        and ep.deleted = 0
+    </select>
+</mapper>

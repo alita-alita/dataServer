@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordIndustryLabelMapper">
+    <delete id="physicsBatchDeleteByChainId">
+        delete from record_industry_label ril
+        where ril.chain_id = #{chain_id}
+    </delete>
+    <delete id="physicsBatchDeleteNotRelation" parameterType="java.lang.String">
+        delete ril
+        from record_industry_label ril
+                 left join record_industry_chain_node_label_relation ricnlr
+                           on ril.biz_id = ricnlr.industry_label_id
+        where ricnlr.id is null
+    </delete>
+
+    <select id="getMaxBizId" resultType="java.lang.Long">
+        select  max(ril.biz_id)
+        from record_industry_label ril
+    </select>
+    <select id="getRelationErrorCount" resultType="cn.idicc.taotie.infrastructment.entity.icm.RecordIndustryLabelDO"
+            parameterType="java.lang.Long">
+        select ril.*
+        from record_industry_label ril
+                 inner join record_industry_chain_node_label_relation ricnlr on ricnlr.industry_label_id = ril.biz_id
+        where ricnlr.industry_label_id = #{chainId}
+        group by ril.id
+        having count(1)>1
+    </select>
+
+    <select id="selectOneByLabelName" resultType="cn.idicc.taotie.infrastructment.entity.icm.RecordIndustryLabelDO"
+            parameterType="java.lang.String">
+        select * from record_industry_label
+        where label_name = #{labelName}
+        limit 1
+    </select>
+
+    <update id="updateById" parameterType="map">
+        update record_industry_label
+        set label_name = #{labelName},
+        label_desc = #{labelDesc},
+        deleted = #{deleted}
+        where id = #{id}
+    </update>
+
+    <select id="countForJobDetailByChainId" parameterType="map" resultType="long">
+        select count(1) as total from `record_industry_chain_node` t1
+        inner join `chain_node_ref_atom_node` t2 on t1.`biz_id` = t2.node_id
+        inner join `atom_node_ref_industry_label` t3 on t2.`atom_node_id` = t3.`atom_node_id`
+        inner join `record_industry_label` t4 on t3.`industry_label_id` = t4.`biz_id`
+        where
+        t1.deleted = 0
+        <if test="chainId != null">
+            and t1.`chain_id` = #{chainId}
+        </if>
+        <if test="status != null">
+            and t4.status >= #{status}
+        </if>
+    </select>
+
+    <select id="getLabelByChainId" resultType="cn.idicc.taotie.infrastructment.entity.icm.RecordIndustryLabelDO">
+        select t1.* from
+            record_industry_label t1
+                inner join atom_node_ref_industry_label t2 on t1.`biz_id` = t2.`industry_label_id`
+                inner join `chain_node_ref_atom_node` t3 on t2.`atom_node_id` = t3.`atom_node_id`
+                inner join `record_industry_chain_node` t4 on t3.`node_id`  = t4.`biz_id` and t4.`chain_id` = #{chainId}
+    </select>
+
+    <select id="getLabelByNodeId" resultType="cn.idicc.taotie.infrastructment.entity.icm.RecordIndustryLabelDO">
+        select t1.* from
+            record_industry_label t1
+                inner join atom_node_ref_industry_label t2 on t1.`biz_id` = t2.`industry_label_id`
+                inner join `chain_node_ref_atom_node` t3 on t2.`atom_node_id` = t3.`atom_node_id`
+        where t3.`node_id` = #{nodeId}
+    </select>
+
+</mapper>

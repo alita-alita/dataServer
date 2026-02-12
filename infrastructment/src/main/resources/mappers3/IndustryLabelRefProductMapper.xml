@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.IndustryLabelRefProductMapper">
+
+    <select id="selectMatchedProducts" parameterType="map" resultType="cn.idicc.taotie.infrastructment.dto.ProductMatchesDTO">
+
+        SELECT
+            t2.`biz_id` as industryLabelId,
+            t2.label_name as industryLabelName ,
+            t3.`biz_id` as productId ,
+            t3.product_name as productName,
+            t3.product_description as productDescription,
+            t3.product_purpose as productPurpose,
+            t3.enterprise_id as enterpriseId,
+            t3.enterprise_name as enterpriseName,
+            t3.enterprise_uni_code as enterpriseUniCode,
+            t3.data_source as dataSource,
+            t6.chain_id  as industryChainId,
+            t6.biz_id  as industryChainNodeId,
+            t6.node_name as industryChainNodeName
+        FROM `industry_label_ref_product` t1
+        inner join `record_industry_label`  t2 on t1.`industry_label_id`  = t2.biz_id
+        inner join `record_app_product` t3 on t1.`product_id` = t3.`biz_id`
+        inner join `atom_node_ref_industry_label` t4 on t1.`industry_label_id`  = t4.`industry_label_id`
+        inner join `chain_node_ref_atom_node` t5 on t4.`atom_node_id`  = t5.`atom_node_id`
+        inner join `record_industry_chain_node` t6 on t5.`node_id` = t6.`biz_id` and t6.`chain_id` = #{chainId}
+        where t1.`industry_label_id` in
+        <foreach collection="industryLabelIds" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        limit #{start}, #{size}
+
+
+    </select>
+
+
+</mapper>

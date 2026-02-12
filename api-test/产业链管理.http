@@ -1,0 +1,115 @@
+### 分类列表
+GET {{base_url}}/record/admin/industryChain/categoryList
+Content-Type: application/json
+token: {{token}}
+
+### 新增产业链
+POST {{base_url}}/record/admin/industryChain/save
+Content-Type: application/json
+token: {{token}}
+
+{
+  "chainCode":"250103",
+  "chainName":"0103新增",
+  "notes": "无",
+  "categoryId": 1
+}
+
+### 产业链详情
+GET {{base_url}}/record/admin/industryChain/detail?version=CHAIN.72.8&chainId=72
+Content-Type: application/json
+token: {{token}}
+
+### 更新产业链
+POST {{base_url}}/record/admin/industryChain/update
+Content-Type: application/json
+token: {{token}}
+
+{
+  "nodeId":1287,
+  "version":"CHAIN.72.8",
+  "notes": "无",
+  "categoryId": 1
+}
+
+### 分页查询产业链
+POST {{base_url}}/record/admin/industryChain/page
+Content-Type: application/json
+token: {{token}}
+appId: 12
+
+{"categoryId":"",
+  "chainName":"",
+  "state":"",
+  "pageNum":1,
+  "pageSize":10
+}
+
+### 新增产业链标签
+POST {{base_url}}/record/admin/industryLabel/add
+Content-Type: application/json
+token: {{token}}
+
+{
+  "version": "CHAIN.1.1",
+  "chainId": 1,
+  "labelName": "AAA",
+  "labelDesc": "aaa"
+}
+
+
+### 列举产业链标签
+GET {{base_url}}/record/admin/industryLabel/list?version=CHAIN.1.1
+Content-Type: application/json
+token: {{token}}
+
+### 保存or更新产业链节点
+POST {{base_url}}/record/admin/industryChainNode/save
+Content-Type: application/json
+token: {{token}}
+
+{
+  "chainNodeId": 10,
+  "version": "CHAIN.1.1",
+  "chainId": 1,
+  "nodeName": "node_3_5",
+  "nodeOrder": 1,
+  "nodeLevel": 3,
+  "nodeParent": "5",
+  "nodeDesc": "laji",
+  "isLeaf":1,
+  "showMaxNumber": 100,
+  "thresholdScore": 0.8,
+  "labelIds": [1]
+}
+
+### 更新产业链节点分数
+POST {{base_url}}/record/admin/industryChainNode/score/update
+Content-Type: application/json
+token: {{token}}
+
+{
+  "chainNodeId": 3,
+  "version": "CHAIN.1.1",
+  "thresholdScore": 0.1
+}
+
+### 产业链节点树
+GET {{base_url}}/record/admin/industryChainNode/tree?chainId=1&version=CHAIN.1.1
+Content-Type: application/json
+token: {{token}}
+
+### 产业链节点详情
+GET {{base_url}}/record/admin/industryChainNode/detail?id=10&version=CHAIN.1.1
+Content-Type: application/json
+token: {{token}}
+
+### 删除产业链节点
+GET {{base_url}}/record/admin/industryChainNode/delete?id=5&version=CHAIN.1.1
+Content-Type: application/json
+token: {{token}}
+
+### 产业链叶子节点列表
+GET {{base_url}}/record/admin/industryChainNode/leaf/list?chainId=54&version=CHAIN.54.9
+Content-Type: application/json
+token: {{token}}

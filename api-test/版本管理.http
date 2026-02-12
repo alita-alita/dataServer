@@ -1,0 +1,61 @@
+### 开始生产
+POST {{base_url}}/record/admin/version/chain/produce
+Content-Type: application/json
+token: {{token}}
+
+{
+  "version": "CHAIN.54.10"
+}
+
+### 停止生产
+GET {{base_url}}/record/admin/version/chain/stop?version=CHAIN.54.10
+Content-Type: application/json
+token: {{token}}
+
+### 申请编辑
+GET {{base_url}}/record/admin/version/chain/apply/edit?version=CHAIN.72.6
+Content-Type: application/json
+token: {{token}}
+
+### 复制产业链
+GET {{base_url}}/record/admin/version/chain/copy?version=CHAIN.61.1&chainId=61
+Content-Type: application/json
+token: {{token}}
+
+### 生产记录分页
+POST {{base_url}}/record/admin/version/chain/produce/page
+Content-Type: application/json
+token: {{token}}
+
+{
+  "version": ["CHAIN.72.5"]
+}
+
+### 生产记录详情
+GET {{base_url}}/record/admin/version/chain/produce/detail?version=CHAIN.54.2
+Content-Type: application/json
+token: {{token}}
+
+### 上线记录分页
+POST {{base_url}}/record/admin/version/chain/online/page
+Content-Type: application/json
+token: {{token}}
+
+{
+  "version": []
+}
+
+### 质检导出
+POST {{base_url}}/record/admin/version/chain/produce/check
+Content-Type: application/json
+token: {{token}}
+
+{
+  "version": "CHAIN.114.1",
+  "isLimitScore":true
+}
+
+### 开始上线
+GET {{base_url}}/record/admin/version/chain/online?version=CHAIN.54.9&isDw=true&isChain=false
+Content-Type: application/json
+token: {{token}}

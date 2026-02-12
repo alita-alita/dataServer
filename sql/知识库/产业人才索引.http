@@ -1,0 +1,103 @@
+### 产业人才知识库
+PUT /dev_knowledge_talent_enterprise
+
+{
+  "mapping": {
+    "_doc": {
+      "dynamic": "false",
+      "properties": {
+        "chainIds": {
+          "type": "long"
+        },
+        "enterpriseAddress": {
+          "type": "text"
+        },
+        "enterpriseArea": {
+          "type": "keyword"
+        },
+        "enterpriseCity": {
+          "type": "keyword"
+        },
+        "enterpriseId": {
+          "type": "long"
+        },
+        "enterpriseMobile": {
+          "type": "keyword"
+        },
+        "enterpriseName": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "enterpriseProvince": {
+          "type": "keyword"
+        },
+        "enterpriseScale": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "establishment": {
+          "type": "long"
+        },
+        "financingRounds": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "id": {
+          "type": "long"
+        },
+        "listedSector": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "modifyTime": {
+          "type": "long"
+        },
+        "occupation": {
+          "type": "keyword",
+          "index": false
+        },
+        "registeredCapital": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "researchField": {
+          "type": "keyword",
+          "index": false
+        },
+        "schoolName": {
+          "type": "keyword",
+          "index": false
+        },
+        "talentArea": {
+          "type": "keyword"
+        },
+        "talentCity": {
+          "type": "keyword"
+        },
+        "talentMd5": {
+          "type": "keyword",
+          "index": false
+        },
+        "talentName": {
+          "type": "keyword",
+          "index": false
+        },
+        "talentProvince": {
+          "type": "keyword"
+        },
+        "talentTelephoneNumber": {
+          "type": "keyword",
+          "index": false
+        },
+        "technologicalInnovation": {
+          "type": "long"
+        }
+      }
+    }
+  }
+}

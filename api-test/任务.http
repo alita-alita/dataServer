@@ -1,0 +1,24 @@
+### health
+GET {{base_url}}/ok
+Content-Type: application/json
+#token: {{token}}
+
+### test
+GET {{base_url}}/test/test
+Content-Type: application/json
+#token: {{token}}
+
+### 产业链数据导入
+POST {{base_url}}/record/admin/industryChain/import?chainId=74
+#Token
+Cache-Control: no-cache
+#请求类型
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+token: {{token}}
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="Desktop.zip"
+Content-Type: multipart/form-data
+
+< C:\Users\admin\Desktop\Desktop.zip
+--WebAppBoundary--

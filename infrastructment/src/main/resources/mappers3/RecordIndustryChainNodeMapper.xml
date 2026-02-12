@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.idicc.taotie.infrastructment.mapper.icm.RecordIndustryChainNodeMapper">
+    <delete id="physicsBatchDeleteByBizIds">
+        DELETE FROM record_industry_chain_node
+        WHERE  biz_id IN
+        <foreach collection="biz_ids" separator="," open="(" close=")" item="biz_id">
+            #{biz_id}
+        </foreach>
+    </delete>
+    <delete id="physicsBatchDeleteByChainId">
+        delete from record_industry_chain_node ricn
+        where ricn.chain_id = #{chain_id}
+
+    </delete>
+
+    <select id="getMaxBizId" resultType="java.lang.Long">
+        select max(ric.biz_id)
+        from record_industry_chain_node ric
+    </select>
+</mapper>
